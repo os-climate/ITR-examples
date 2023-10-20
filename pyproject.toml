@@ -29,9 +29,6 @@ classifiers = [
   "Topic :: Scientific/Engineering",
   "Topic :: Software Development",
 ]
-dependencies = [
-  ITR,
-]
 
 [project.urls]
 Homepage = "https://github.com/os-climate/ITR-examples"

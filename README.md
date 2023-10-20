@@ -78,4 +78,4 @@ pip install -e .[dev]
 ```
 
 ## User Interface Screenshot
-![](ITR_demo.gif)
+![](docs/ITR_demo.gif)
