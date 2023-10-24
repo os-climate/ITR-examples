@@ -7,10 +7,13 @@ import numpy as np
 import json
 import pickle
 import os
+
 from uuid import uuid4
-import base64
+
+# import base64
 import io
-import warnings
+
+# import warnings
 import ast
 
 import dash
@@ -76,7 +79,7 @@ background_callback_manager = DiskcacheManager(cache, cache_by=[lambda: launch_u
 have_breakpoint = False
 use_data_vault = False
 
-examples_dir = ""  #'examples'
+examples_dir = ""  # 'examples'
 data_dir = "data"
 root = os.path.abspath("")
 
@@ -162,7 +165,10 @@ def dequantify_plotly(px_func, df, **kwargs):
                 item0 = s.values[0]
                 s = s.astype(f"pint[{item0.u}]")
                 new_df[col] = ITR.nominal_values(s.pint.m)
-    # **kwargs typically {'x': 'cumulative_target', 'y': 'cumulative_budget', 'size': 'investment_value', 'color': 'sector', 'labels': {'color': 'Sector'}, 'hover_data': ['company_name', 'investment_value', 'temperature_score'], 'title': 'Overview of portfolio'}
+    # **kwargs typically {'x': 'cumulative_target', 'y': 'cumulative_budget', \
+    # 'size': 'investment_value', 'color': 'sector', 'labels': {'color': 'Sector'}, \
+    # 'hover_data': ['company_name', 'investment_value', 'temperature_score'], \
+    # 'title': 'Overview of portfolio'}
 
     return px_func(new_df, **new_kwargs)
 
@@ -1269,7 +1275,7 @@ def recalculate_target_year_ts(
 
     changed_ids = [p["prop_id"] for p in dash.callback_context.triggered]  # to catch which widgets were pressed
 
-    zero_co2 = Q_(0.0, "Gt CO2e")
+    # zero_co2 = Q_(0.0, "Gt CO2e")
     df_fundamentals = df_fundamentals[df_fundamentals.index.isin(df_portfolio.company_id)]
 
     # pf_bm_* is the overlap of our portfolio and our benchmark
@@ -1692,7 +1698,7 @@ def update_graph(
     scope,
     budget_meth,
 ):
-    changed_id = [p["prop_id"] for p in dash.callback_context.triggered][0]  # to catch which widgets were pressed
+    # changed_id = [p["prop_id"] for p in dash.callback_context.triggered][0]  # to catch which widgets were pressed
     amended_portfolio = pd.read_json(io.StringIO(initial_value=portfolio_json), orient="split")
     # Why does this get lost in translation?
     amended_portfolio.index.name = "company_id"

@@ -4,20 +4,23 @@ import os
 import re
 import pandas as pd
 import numpy as np
-from numpy.testing import assert_array_equal
+
+# from numpy.testing import assert_array_equal
 
 import ITR
-from ITR.interfaces import EScope, ETimeFrames
+
+# from ITR.interfaces import EScope, ETimeFrames
+from ITR.interfaces import EScope
 from ITR.interfaces import (
     ICompanyData,
-    ICompanyEIProjectionsScopes,
-    ICompanyEIProjections,
-    ICompanyEIProjection,
+    #    ICompanyEIProjectionsScopes,
+    #    ICompanyEIProjections,
+    #    ICompanyEIProjection,
 )
 from ITR.interfaces import (
     IProductionBenchmarkScopes,
     IEIBenchmarkScopes,
-    PortfolioCompany,
+    #    PortfolioCompany,
     ITargetData,
 )
 
@@ -26,25 +29,34 @@ from ITR.data.base_providers import (
     BaseProviderProductionBenchmark,
     BaseProviderIntensityBenchmark,
     EITargetProjector,
-    EITrajectoryProjector,
+    #    EITrajectoryProjector,
 )
 
 from ITR.data.data_warehouse import DataWarehouse
-from ITR.temperature_score import TemperatureScore
-from ITR.portfolio_aggregation import PortfolioAggregationMethod
 
-from pint import Quantity
-from ITR.data.osc_units import ureg, Q_, PA_, asPintSeries, asPintDataFrame
+# from ITR.temperature_score import TemperatureScore
+# from ITR.portfolio_aggregation import PortfolioAggregationMethod
+
+# from pint import Quantity
+# from ITR.data.osc_units asPintSeries
+from ITR.data.osc_units import Q_, PA_, asPintDataFrame
+
+# from ITR.data.osc_units import ureg
 from ITR.configs import ColumnsConfig
 
-from utils import gen_company_data, DequantifyQuantity, assert_pint_series_equal
+# from utils import DequantifyQuantity
+from utils import gen_company_data, assert_pint_series_equal
 
 import plotly.express as px
-import plotly.graph_objects as go
+
+# import plotly.graph_objects as go
+
+# https://stackoverflow.com/a/62853540/1291237
+from plotly.subplots import make_subplots
 
 
 def print_expected(target_df, company_data):
-    target_indexes = target_df.index.to_list()
+    # target_indexes = target_df.index.to_list()
     for c in company_data:
         key = f"{c.company_id} - {c.company_name}"
         suffix = c.company_name.split(" ")[-1].lower()
@@ -55,9 +67,6 @@ def print_expected(target_df, company_data):
 """
         )
 
-
-# https://stackoverflow.com/a/62853540/1291237
-from plotly.subplots import make_subplots
 
 subfig = make_subplots(specs=[[{"secondary_y": True}]])
 
@@ -328,24 +337,25 @@ class TestTargets(unittest.TestCase):
             ei_df_t=ei_df_t,
         )
 
-        plot_dict = {
-            # "Trajectory": (co_productions * co_ei_trajectory).cumsum(),
-            f"{c.company_id} - {c.company_name}": self.base_company_data._convert_projections_to_series(
-                c, "projected_targets"
-            )
-            for c in company_data
-        }
-        target_df = pd.DataFrame(plot_dict)
+        # plot_dict = {
+        # "Trajectory": (co_productions * co_ei_trajectory).cumsum(),
+        #     f"{c.company_id} - {c.company_name}": self.base_company_data._convert_projections_to_series(
+        #         c, "projected_targets"
+        #     )
+        #     for c in company_data
+        # }
 
-        fig = px.line(
-            target_df.pint.dequantify().droplevel(1, axis=1),
-            y=[k for k in plot_dict.keys()],
-            labels={
-                "index": "Year",
-                "value": f"{intensity.u:~P}",
-                "variable": "test_target_netzero",
-            },
-        )
+        # target_df = pd.DataFrame(plot_dict)
+
+        # fig = px.line(
+        #     target_df.pint.dequantify().droplevel(1, axis=1),
+        #     y=[k for k in plot_dict.keys()],
+        #     labels={
+        #         "index": "Year",
+        #         "value": f"{intensity.u:~P}",
+        #         "variable": "test_target_netzero",
+        #     },
+        # )
         # fig.show()
 
         # print_expected(target_df, [company_ag, company_ah, company_ai, company_aj])
@@ -742,24 +752,25 @@ class TestTargets(unittest.TestCase):
             ei_df_t=ei_df_t,
         )
 
-        plot_dict = {
-            # "Trajectory": (co_productions * co_ei_trajectory).cumsum(),
-            f"{c.company_id} - {c.company_name}": self.base_company_data._convert_projections_to_series(
-                c, "projected_targets"
-            )
-            for c in company_data
-        }
-        target_df = pd.DataFrame(plot_dict)
+        # plot_dict = {
+        # "Trajectory": (co_productions * co_ei_trajectory).cumsum(),
+        #     f"{c.company_id} - {c.company_name}": self.base_company_data._convert_projections_to_series(
+        #         c, "projected_targets"
+        #     )
+        #     for c in company_data
+        # }
 
-        fig = px.line(
-            target_df.pint.dequantify().droplevel(1, axis=1),
-            y=[k for k in plot_dict.keys()],
-            labels={
-                "index": "Year",
-                "value": f"{intensity.u:~P}",
-                "variable": "test_target_2030",
-            },
-        )
+        # target_df = pd.DataFrame(plot_dict)
+
+        # fig = px.line(
+        #     target_df.pint.dequantify().droplevel(1, axis=1),
+        #     y=[k for k in plot_dict.keys()],
+        #     labels={
+        #         "index": "Year",
+        #         "value": f"{intensity.u:~P}",
+        #         "variable": "test_target_2030",
+        #     },
+        # )
         # fig.show()
 
         # print_expected(target_df, [company_ag, company_ah, company_ai, company_aj])
@@ -1157,24 +1168,25 @@ class TestTargets(unittest.TestCase):
             ei_df_t=ei_df_t,
         )
 
-        plot_dict = {
-            # "Trajectory": (co_productions * co_ei_trajectory).cumsum(),
-            f"{c.company_id} - {c.company_name}": self.base_company_data._convert_projections_to_series(
-                c, "projected_targets"
-            )
-            for c in company_data
-        }
-        target_df = pd.DataFrame(plot_dict)
+        # plot_dict = {
+        # "Trajectory": (co_productions * co_ei_trajectory).cumsum(),
+        #     f"{c.company_id} - {c.company_name}": self.base_company_data._convert_projections_to_series(
+        #         c, "projected_targets"
+        #    )
+        #     for c in company_data
+        # }
 
-        fig = px.line(
-            target_df.pint.dequantify().droplevel(1, axis=1),
-            y=[k for k in plot_dict.keys()],
-            labels={
-                "index": "Year",
-                "value": f"{intensity.u:~P}",
-                "variable": "test_target_overlaps",
-            },
-        )
+        # target_df = pd.DataFrame(plot_dict)
+
+        # fig = px.line(
+        #     target_df.pint.dequantify().droplevel(1, axis=1),
+        #     y=[k for k in plot_dict.keys()],
+        #     labels={
+        #         "index": "Year",
+        #         "value": f"{intensity.u:~P}",
+        #         "variable": "test_target_overlaps",
+        #     },
+        # )
         # fig.show()
 
         # print_expected(target_df, company_data)
@@ -1754,7 +1766,7 @@ class TestTargets(unittest.TestCase):
         # fig.show()
 
         self.data_warehouse = DataWarehouse(self.base_company_data, self.base_production_bm, self.OECM_EI_S3_bm)
-        companies = self.data_warehouse.get_preprocessed_company_data(company_index)
+        # companies = self.data_warehouse.get_preprocessed_company_data(company_index)
 
         print_expected(
             target_df.filter(regex="Target:").rename(columns=lambda x: re.sub("Target: ", "", x)),
