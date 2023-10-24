@@ -5,14 +5,15 @@ import random
 
 import ITR
 from pint import Quantity
-from pint_pandas import PintType
-from ITR.data.osc_units import EI_Metric, EI_Quantity, asPintSeries
+
+# from pint_pandas import PintType
+from ITR.data.osc_units import EI_Metric, EI_Quantity
 
 from ITR.interfaces import EScope
 from ITR.interfaces import (
     ICompanyData,
     ICompanyEIProjectionsScopes,
-    ICompanyEIProjections,
+    #    ICompanyEIProjections,
     ICompanyEIProjection,
 )
 
