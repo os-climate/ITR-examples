@@ -54,6 +54,7 @@ import osc_ingest_trino as osc
 
 from ITR.data.vault_providers import (
     VaultCompanyDataProvider,
+    VaultProviderProductionBenchmark,
     DataVaultWarehouse,
     requantify_df,
 )
