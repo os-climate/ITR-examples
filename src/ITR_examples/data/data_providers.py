@@ -7,10 +7,20 @@ import pandas as pd
 from pint import Quantity
 from ITR.data.osc_units import ureg
 
-from ITR.interfaces import ICompanyData, EScope, IHistoricData, IProductionRealization, IHistoricEmissionsScopes, \
-    IHistoricEIScopes, ICompanyEIProjection, ICompanyEIProjectionsScopes, ICompanyEIProjections
+from ITR.interfaces import (
+    ICompanyData,
+    EScope,
+    IHistoricData,
+    IProductionRealization,
+    IHistoricEmissionsScopes,
+    IHistoricEIScopes,
+    ICompanyEIProjection,
+    ICompanyEIProjectionsScopes,
+    ICompanyEIProjections,
+)
 
-from ITR.configs import TabsConfig, ColumnsConfig, VariablesConfig, TemperatureScoreControls, TemperatureScoreConfig 
+from ITR.configs import TabsConfig, ColumnsConfig, VariablesConfig, TemperatureScoreControls, TemperatureScoreConfig
+
 
 class CompanyDataProvider(ABC):
     """
@@ -70,7 +80,6 @@ class CompanyDataProvider(ABC):
         """
         raise NotImplementedError
 
-
     @abstractmethod
     def get_company_projected_targets(self, company_ids: List[str]) -> pd.DataFrame:
         """
@@ -125,10 +134,16 @@ class IntensityBenchmarkDataProvider(ABC):
     This Data Container contains emission intensity data on benchmark level. Data has a regions and sector indices.
     Initialized IntensityBenchmarkDataProvider is required when setting up a data warehouse instance.
     """
+
     AFOLU_CORRECTION_FACTOR = 0.76  # AFOLU -> Acronym of agriculture, forestry and other land use
 
-    def __init__(self, benchmark_temperature: Quantity['delta_degC'], benchmark_global_budget: Quantity['CO2'], is_AFOLU_included: bool,
-                 **kwargs):
+    def __init__(
+        self,
+        benchmark_temperature: Quantity["delta_degC"],
+        benchmark_global_budget: Quantity["CO2"],
+        is_AFOLU_included: bool,
+        **kwargs,
+    ):
         """
         Create a new data provider instance.
 
@@ -151,19 +166,22 @@ class IntensityBenchmarkDataProvider(ABC):
         self._is_AFOLU_included = value
 
     @property
-    def benchmark_temperature(self) -> Quantity['delta_degC']:
+    def benchmark_temperature(self) -> Quantity["delta_degC"]:
         """
         :return: assumed temperature for the benchmark. for OECM 1.5C for example
         """
         return self._benchmark_temperature
 
     @property
-    def benchmark_global_budget(self) -> Quantity['CO2']:
+    def benchmark_global_budget(self) -> Quantity["CO2"]:
         """
         :return: Benchmark provider assumed global budget. if AFOLU is not included global budget is divided by 0.76
         """
-        return self._benchmark_global_budget if self.is_AFOLU_included else (
-                self._benchmark_global_budget / self.AFOLU_CORRECTION_FACTOR)
+        return (
+            self._benchmark_global_budget
+            if self.is_AFOLU_included
+            else (self._benchmark_global_budget / self.AFOLU_CORRECTION_FACTOR)
+        )
 
     @benchmark_global_budget.setter
     def benchmark_global_budget(self, value):
