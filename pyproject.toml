@@ -38,6 +38,9 @@ dependencies = [
   "multiprocess==0.70.14",
 ]
 
+[project.scripts]
+itr-ui = "ITR_examples.ITR_UI:main"
+
 [project.urls]
 Homepage = "https://github.com/os-climate/ITR-examples"
 Repository = "https://github.com/os-climate/ITR-examples"
