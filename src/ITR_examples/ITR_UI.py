@@ -2247,5 +2247,6 @@ def spinner_concentrator(*_):
 if __name__ == "__main__":
     app.run_server(use_reloader=False, debug=True)
 
+
 def main():
     app.run_server(use_reloader=False, debug=True)
