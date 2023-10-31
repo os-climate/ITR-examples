@@ -5,7 +5,7 @@ description = "Example code and user interface for the ITR project."
 authors = [
   { name = "Michael Tiemann", email = "72577720+MichaelTiemannOSC@users.noreply.github.com" },
 ]
-requires-python = ">=3.9"
+requires-python = "<3.13,>=3.9"
 readme = "README.md"
 license = { text = "Apache-2.0" }
 keywords = ["Climate", "ITR", "Finance"]
@@ -63,7 +63,7 @@ lint = "pre-commit run --all-files"
 complete = { call = "tasks.complete:main", help = "Create autocomplete files for bash and fish" }
 
 [tool.pdm.dev-dependencies]
-test = ["pdm[pytest]", "pdm[publish]", "pytest-cov"]
+test = ["pdm-publish", "pytest-cov"]
 tox = ["tox", "tox-pdm>=0.5"]
 doc = ["sphinx"]
 dev = ["tox>=4.11.3", "tox-pdm>=0.7.0"]
