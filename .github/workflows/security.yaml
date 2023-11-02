@@ -37,6 +37,7 @@ jobs:
 
       - name: "Install dependencies"
         run: |
+          pdm config venv.in_project false
           pdm lock
           pdm export -o requirements.txt
           python -m pip install -r requirements.txt
