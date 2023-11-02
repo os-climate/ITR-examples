@@ -37,7 +37,7 @@ jobs:
 
       - name: "Install dependencies"
         run: |
-          pip install --upgrade -v pip | true
+          pip install --upgrade -v pip
           pdm lock
           pdm export -o requirements.txt
           python -m pip install -r requirements.txt
