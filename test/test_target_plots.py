@@ -45,7 +45,7 @@ from ITR.data.osc_units import Q_, PA_, asPintDataFrame
 from ITR.configs import ColumnsConfig
 
 # from utils import DequantifyQuantity
-from utils import gen_company_data, assert_pint_series_equal
+from .utils import gen_company_data, assert_pint_series_equal
 
 import plotly.express as px
 
