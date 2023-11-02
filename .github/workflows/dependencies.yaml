@@ -7,7 +7,12 @@ on:
 
 jobs:
   update-dependencies:
+    name: "Update Python dependencies"
     runs-on: ubuntu-latest
+    permissions:
+      # IMPORTANT: mandatory to raise the PR
+      id-token: write
+
     steps:
       - uses: actions/checkout@v3
 
