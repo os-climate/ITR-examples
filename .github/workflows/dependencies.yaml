@@ -12,6 +12,9 @@ jobs:
     permissions:
       # IMPORTANT: mandatory to raise the PR
       id-token: write
+      pull-requests: write
+      repository-projects: write
+      contents: write
 
     steps:
       - uses: actions/checkout@v3
