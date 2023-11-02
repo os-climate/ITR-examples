@@ -135,9 +135,6 @@ name = "astroid"
 version = "3.0.1"
 requires_python = ">=3.8.0"
 summary = "An abstract syntax tree for Python with inference support."
-dependencies = [
-    "typing-extensions>=4.0.0; python_version < \"3.11\"",
-]
 files = [
     {file = "astroid-3.0.1-py3-none-any.whl", hash = "sha256:7d5895c9825e18079c5aeac0572bc2e4c83205c95d416e0b4fee8bc361d2d9ca"},
     {file = "astroid-3.0.1.tar.gz", hash = "sha256:86b0bb7d7da0be1a7c4aedb7974e391b32d4ed89e33de6ed6902b4b15c97577e"},
@@ -231,12 +228,12 @@ files = [
 
 [[package]]
 name = "blinker"
-version = "1.6.3"
-requires_python = ">=3.7"
+version = "1.7.0"
+requires_python = ">=3.8"
 summary = "Fast, simple object-to-object and broadcast signaling"
 files = [
-    {file = "blinker-1.6.3-py3-none-any.whl", hash = "sha256:296320d6c28b006eb5e32d4712202dbcdcbf5dc482da298c2f44881c43884aaa"},
-    {file = "blinker-1.6.3.tar.gz", hash = "sha256:152090d27c1c5c722ee7e48504b02d76502811ce02e1523553b4cf8c8b3d3a8d"},
+    {file = "blinker-1.7.0-py3-none-any.whl", hash = "sha256:c3f865d4d54db7abc53758a01601cf343fe55b84c1de4e3fa910e420b438d5b9"},
+    {file = "blinker-1.7.0.tar.gz", hash = "sha256:e6820ff6fa4e4d1d8e2747c2283749c3f547e4fee112b98555cdcdae32996182"},
 ]
 
 [[package]]
@@ -284,22 +281,22 @@ files = [
 
 [[package]]
 name = "boto3"
-version = "1.28.75"
+version = "1.28.76"
 requires_python = ">= 3.7"
 summary = "The AWS SDK for Python"
 dependencies = [
-    "botocore<1.32.0,>=1.31.75",
+    "botocore<1.32.0,>=1.31.76",
     "jmespath<2.0.0,>=0.7.1",
     "s3transfer<0.8.0,>=0.7.0",
 ]
 files = [
-    {file = "boto3-1.28.75-py3-none-any.whl", hash = "sha256:b959decd588982bc919bfcbebc7916926b05003a0093e7f2845362da4f5dd9fc"},
-    {file = "boto3-1.28.75.tar.gz", hash = "sha256:63d772a784e8e35ee51974eb1c20dff5faa51b007d22c5647783f18966bf4042"},
+    {file = "boto3-1.28.76-py3-none-any.whl", hash = "sha256:85e2fa361ad3210d30800bad311688261f2673a9b301e0edab56463d89609761"},
+    {file = "boto3-1.28.76.tar.gz", hash = "sha256:d18688bc5d688decf3cc404430a3ac3ec317be653cdcfbc51104c01f38a66434"},
 ]
 
 [[package]]
 name = "botocore"
-version = "1.31.75"
+version = "1.31.76"
 requires_python = ">= 3.7"
 summary = "Low-level, data-driven core of boto 3."
 dependencies = [
@@ -309,8 +306,8 @@ dependencies = [
     "urllib3<2.1,>=1.25.4; python_version >= \"3.10\"",
 ]
 files = [
-    {file = "botocore-1.31.75-py3-none-any.whl", hash = "sha256:fa078c4aa9a5777b3ede756540e62fec551e13d39cf7abf9a37bb81981496d68"},
-    {file = "botocore-1.31.75.tar.gz", hash = "sha256:d704ea9867b2227de0350bc2a5ca2543349e164ecb5d15edbfacbb05f2056482"},
+    {file = "botocore-1.31.76-py3-none-any.whl", hash = "sha256:74e0a4515d61b2860b24dc208ca89a68d79dc00147125d531746d3ba808822ad"},
+    {file = "botocore-1.31.76.tar.gz", hash = "sha256:479abb5a1ee03eb00faa1ea176bc595b2f46f7494777807681a9df45ed99ea18"},
 ]
 
 [[package]]
@@ -3446,12 +3443,12 @@ files = [
 
 [[package]]
 name = "tomlkit"
-version = "0.12.1"
+version = "0.12.2"
 requires_python = ">=3.7"
 summary = "Style preserving TOML library"
 files = [
-    {file = "tomlkit-0.12.1-py3-none-any.whl", hash = "sha256:712cbd236609acc6a3e2e97253dfc52d4c2082982a88f61b640ecf0817eab899"},
-    {file = "tomlkit-0.12.1.tar.gz", hash = "sha256:38e1ff8edb991273ec9f6181244a6a391ac30e9f5098e7535640ea6be97a7c86"},
+    {file = "tomlkit-0.12.2-py3-none-any.whl", hash = "sha256:eeea7ac7563faeab0a1ed8fe12c2e5a51c61f933f2502f7e9db0241a65163ad0"},
+    {file = "tomlkit-0.12.2.tar.gz", hash = "sha256:df32fab589a81f0d7dc525a4267b6d7a64ee99619cbd1eeb0fae32c1dd426977"},
 ]
 
 [[package]]
