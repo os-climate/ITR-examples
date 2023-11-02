@@ -1,4 +1,4 @@
-name: "?~[~T?~O Update dependencies"
+name: "⛔️ Update dependencies"
 
 on:
   workflow_dispatch:
