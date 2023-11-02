@@ -37,9 +37,6 @@ jobs:
 
       - name: "Install dependencies"
         run: |
-          pwd 2>&1
-          ls -al /root/ITR-examples/.venv/bin/python 2>&1 | true
-          mkdir -p .venv/bin | true
           pip install --upgrade -v pip | true
           pdm lock
           pdm export -o requirements.txt
