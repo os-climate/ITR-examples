@@ -8,6 +8,7 @@ import numpy as np
 # from numpy.testing import assert_array_equal
 
 import ITR
+from ITR import data_dir
 
 # from ITR.interfaces import EScope, ETimeFrames
 from ITR.interfaces import EScope
@@ -45,7 +46,7 @@ from ITR.data.osc_units import Q_, PA_, asPintDataFrame
 from ITR.configs import ColumnsConfig
 
 # from utils import DequantifyQuantity
-from .utils import gen_company_data, assert_pint_series_equal
+from .test_utils import gen_company_data, assert_pint_series_equal
 
 import plotly.express as px
 
@@ -102,13 +103,12 @@ class TestTargets(unittest.TestCase):
         self.projector = EITargetProjector()
         self.base_company_data = BaseCompanyDataProvider([])
         # All benchmarks use OECM Production for Production
-        self.benchmark_prod_json = os.path.join(self.root, "data", "json-units", "benchmark_production_OECM.json")
+        self.benchmark_prod_json = os.path.join(data_dir, "benchmark_production_OECM.json")
         # Each EI benchmark is particular to its own construction
-        # self.benchmark_EI_OECM_PC = os.path.join(self.root, "data", "json-units", "benchmark_EI_OECM_PC.json")
-        self.benchmark_EI_OECM_S3 = os.path.join(self.root, "data", "json-units", "benchmark_EI_OECM_S3.json")
-        # self.benchmark_EI_TPI = os.path.join(self.root, "data", "json-units", "benchmark_EI_TPI_2_degrees.json")
-        # self.benchmark_EI_TPI_below_2 = os.path.join(self.root, "data", "json-units",
-        #                                              "benchmark_EI_TPI_below_2_degrees.json")
+        # self.benchmark_EI_OECM_PC = os.path.join(data_dir, "benchmark_EI_OECM_PC.json")
+        self.benchmark_EI_OECM_S3 = os.path.join(data_dir, "benchmark_EI_OECM_S3.json")
+        # self.benchmark_EI_TPI = os.path.join(data_dir, "benchmark_EI_TPI_2_degrees.json")
+        # self.benchmark_EI_TPI_below_2 = os.path.join(data_dir, "benchmark_EI_TPI_below_2_degrees.json")
         # load production benchmarks
         with open(self.benchmark_prod_json) as json_file:
             parsed_json = json.load(json_file)
@@ -1963,6 +1963,14 @@ class TestTargets(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    test = TestTargets()
+    test.setUp()
+    test.test_target_netzero()
+    test.test_target_2030()
+    test.test_target_overlaps()
+
+
+def main():
     test = TestTargets()
     test.setUp()
     test.test_target_netzero()
