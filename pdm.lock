@@ -1183,7 +1183,7 @@ files = [
 
 [[package]]
 name = "itr"
-version = "1.0.7"
+version = "1.0.8"
 requires_python = ">=3.9"
 summary = "Assess the temperature alignment of current targets, commitments, and investment and lending portfolios."
 dependencies = [
@@ -1191,20 +1191,14 @@ dependencies = [
     "Pint>=0.22",
     "SQLAlchemy==1.4.48",
     "autoapi>=2.0.1",
-    "dash-bootstrap-components==1.4.2",
-    "dash==2.11.1",
-    "diskcache==5.6.1",
-    "flask==2.2.5",
     "iam-units>=2022.10.27",
-    "jupyterlab==4.0.4",
-    "matplotlib==3.7.2",
-    "multiprocess==0.70.14",
     "numpy==1.24.3",
     "openpyxl==3.0.10",
     "openscm-units==0.5.2",
     "orca==1.8",
     "osc-ingest-tools>=0.4.3",
     "pandas>=2.1.0",
+    "pip>=23.3.1",
     "psutil==5.9.5",
     "pydantic>=2.3.0",
     "pygithub==1.55",
@@ -1221,8 +1215,8 @@ dependencies = [
     "xlrd==2.0.1",
 ]
 files = [
-    {file = "itr-1.0.7-py3-none-any.whl", hash = "sha256:ac1db28caf66571b91d5886079f22e124f2f91ed36394699c35ff27b97b8245e"},
-    {file = "itr-1.0.7.tar.gz", hash = "sha256:1b683cda5cae456a095263af44893c5fddd34d11715f325f13146f3aac4ae5e3"},
+    {file = "itr-1.0.8-py3-none-any.whl", hash = "sha256:2341b390e12f191152f1b616227fc95eab0a8f029ef05d6157f1d0fdbe1136f8"},
+    {file = "itr-1.0.8.tar.gz", hash = "sha256:fba4978d3f528adf4dc2b06677a00c41f81d26ba9fd7521d0d25323147cb6cc6"},
 ]
 
 [[package]]

@@ -1,12 +1,12 @@
 # Go to folder "examples" and run this app with `python ITR_UI.py` and
 # visit http://127.0.0.1:8050/ in your web browser
 
-
 import pandas as pd
 import numpy as np
 import json
 import pickle
 import os
+from pathlib import Path
 
 from uuid import uuid4
 
@@ -29,6 +29,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 import ITR
+from ITR import data_dir
 
 from ITR.configs import ITR_median, ITR_mean, ColumnsConfig, TemperatureScoreConfig
 from ITR.data.data_warehouse import DataWarehouse
@@ -79,9 +80,7 @@ background_callback_manager = DiskcacheManager(cache, cache_by=[lambda: launch_u
 have_breakpoint = False
 use_data_vault = False
 
-examples_dir = ""  # 'examples'
-data_dir = "data"
-root = os.path.abspath("")
+root = Path(__file__).parent
 
 # Set input filename (from commandline or default)
 parser = argparse.ArgumentParser()
@@ -90,12 +89,11 @@ if len(sys.argv) > 1:
     args = parser.parse_args()
     company_data_path = args.file
 else:
-    company_data_path = os.path.join(root, examples_dir, data_dir, "20220927 ITR V2 Sample Data.xlsx")
+    company_data_path = os.path.join(root, "data", "20220927 ITR V2 Sample Data.xlsx")
 
 # Production benchmark (there's only one, and we have to stretch it from OECM to cover TPI)
-data_json_units_dir = "json-units"
 benchmark_prod_json_file = "benchmark_production_OECM.json"
-benchmark_prod_json = os.path.join(root, examples_dir, data_dir, data_json_units_dir, benchmark_prod_json_file)
+benchmark_prod_json = os.path.join(data_dir, benchmark_prod_json_file)
 with open(benchmark_prod_json) as json_file:
     parsed_json = json.load(json_file)
 
@@ -1056,15 +1054,12 @@ def recalculate_individual_itr(warehouse_pickle_json, eibm, proj_meth, winz, bm_
         else:
             benchmark_file = benchmark_EI_TPI_below_2_file
         # load intensity benchmarks
-        benchmark_EI = os.path.join(root, examples_dir, data_dir, data_json_units_dir, benchmark_file)
+        benchmark_EI = os.path.join(data_dir, benchmark_file)
         with open(benchmark_EI) as json_file:
             parsed_json = json.load(json_file)
         if eibm.startswith("TPI_2_degrees"):
             extra_EI = os.path.join(
-                root,
-                examples_dir,
                 data_dir,
-                data_json_units_dir,
                 benchmark_EI_TPI_2deg_high_efficiency_file
                 if "_high_efficiency" in eibm
                 else benchmark_EI_TPI_2deg_shift_improve_file,
