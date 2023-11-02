@@ -37,6 +37,7 @@ jobs:
 
       - name: "Install dependencies"
         run: |
+          mkdir -p .venv/bin
           pip install --upgrade pip
           pdm lock
           pdm export -o requirements.txt
