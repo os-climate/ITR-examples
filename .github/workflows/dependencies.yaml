@@ -16,6 +16,9 @@ jobs:
       repository-projects: write
       contents: write
 
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
     steps:
       - uses: actions/checkout@v3
 
