@@ -1,59 +1,51 @@
-import unittest
 import json
 import os
 import re
-import pandas as pd
-import numpy as np
-
-# from numpy.testing import assert_array_equal
+import unittest
 
 import ITR
+import numpy as np
+import pandas as pd
+import plotly.express as px
 from ITR import data_dir
 
-# from ITR.interfaces import EScope, ETimeFrames
-from ITR.interfaces import EScope
-from ITR.interfaces import (
-    ICompanyData,
-    #    ICompanyEIProjectionsScopes,
-    #    ICompanyEIProjections,
-    #    ICompanyEIProjection,
+# from ITR.data.osc_units import ureg
+from ITR.configs import ColumnsConfig
+from ITR.data.base_providers import (  # EITrajectoryProjector,
+    BaseCompanyDataProvider,
+    BaseProviderIntensityBenchmark,
+    BaseProviderProductionBenchmark,
+    EITargetProjector,
 )
-from ITR.interfaces import (
-    IProductionBenchmarkScopes,
+from ITR.data.data_warehouse import DataWarehouse
+
+# from pint import Quantity
+# from ITR.data.osc_units asPintSeries
+from ITR.data.osc_units import PA_, Q_, asPintDataFrame
+
+# from ITR.interfaces import EScope, ETimeFrames
+from ITR.interfaces import (  # ICompanyEIProjectionsScopes,; ICompanyEIProjections,; ICompanyEIProjection,; PortfolioCompany,
+    EScope,
+    ICompanyData,
     IEIBenchmarkScopes,
-    #    PortfolioCompany,
+    IProductionBenchmarkScopes,
     ITargetData,
 )
 
-from ITR.data.base_providers import (
-    BaseCompanyDataProvider,
-    BaseProviderProductionBenchmark,
-    BaseProviderIntensityBenchmark,
-    EITargetProjector,
-    #    EITrajectoryProjector,
-)
+# https://stackoverflow.com/a/62853540/1291237
+from plotly.subplots import make_subplots
 
-from ITR.data.data_warehouse import DataWarehouse
+# from utils import DequantifyQuantity
+from .test_utils import assert_pint_series_equal, gen_company_data
+
+# from numpy.testing import assert_array_equal
+
 
 # from ITR.temperature_score import TemperatureScore
 # from ITR.portfolio_aggregation import PortfolioAggregationMethod
 
-# from pint import Quantity
-# from ITR.data.osc_units asPintSeries
-from ITR.data.osc_units import Q_, PA_, asPintDataFrame
-
-# from ITR.data.osc_units import ureg
-from ITR.configs import ColumnsConfig
-
-# from utils import DequantifyQuantity
-from .test_utils import gen_company_data, assert_pint_series_equal
-
-import plotly.express as px
 
 # import plotly.graph_objects as go
-
-# https://stackoverflow.com/a/62853540/1291237
-from plotly.subplots import make_subplots
 
 
 def print_expected(target_df, company_data):

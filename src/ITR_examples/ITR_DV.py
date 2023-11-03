@@ -1,73 +1,61 @@
 # Go to folder "examples" and run this app with `python ITR_DV.py` and
 # visit http://127.0.0.1:8051/ in your web browser
 
-import pandas as pd
-import numpy as np
-import json
-import pickle
-import os
-
-from uuid import uuid4
-
-# import base64
+import argparse
 
 # import io
 # import warnings
 import ast
+import json
+import logging
+import os
+import pickle
+import sys
+from uuid import uuid4
 
 import dash
-from dash import html, dcc
-from dash import DiskcacheManager
-
 import dash_bootstrap_components as dbc  # should be installed separately
-
-from dash.dependencies import Input, Output, State
-from dash.exceptions import PreventUpdate
 import diskcache
+import ITR
+import numpy as np
+import osc_ingest_trino as osc
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-
-import ITR
-from .. import data_dir
-
-from ITR.configs import ITR_median, ITR_mean
+from dash import DiskcacheManager, dcc, html
+from dash.dependencies import Input, Output, State
+from dash.exceptions import PreventUpdate
+from ITR.configs import ITR_mean, ITR_median
+from ITR.data.base_providers import BaseProviderIntensityBenchmark, BaseProviderProductionBenchmark
 from ITR.data.data_warehouse import DataWarehouse
-from ITR.portfolio_aggregation import PortfolioAggregationMethod
-from ITR.temperature_score import TemperatureScore
-
-from ITR.data.base_providers import (
-    BaseProviderProductionBenchmark,
-    BaseProviderIntensityBenchmark,
-)
+from ITR.data.osc_units import Q_, asPintSeries, requantify_df_from_columns, ureg
 from ITR.data.template import TemplateProviderCompany
+from ITR.data.vault_providers import (
+    DataVaultWarehouse,
+    VaultCompanyDataProvider,
+    VaultProviderProductionBenchmark,
+    requantify_df,
+)
 from ITR.interfaces import (
     EScope,
-    ETimeFrames,
     EScoreResultType,
+    ETimeFrames,
     IEIBenchmarkScopes,
     IProductionBenchmarkScopes,
     ProjectionControls,
 )
-
-# from ITR.configs import LoggingConfig
-
-from ITR.data.osc_units import ureg, Q_, asPintSeries, requantify_df_from_columns
+from ITR.portfolio_aggregation import PortfolioAggregationMethod
+from ITR.temperature_score import TemperatureScore
 from pint import Quantity
 from pint_pandas import PintType
 
-import logging
+from .. import data_dir
 
-import sys
-import argparse
+# import base64
 
-import osc_ingest_trino as osc
 
-from ITR.data.vault_providers import (
-    VaultCompanyDataProvider,
-    VaultProviderProductionBenchmark,
-    DataVaultWarehouse,
-    requantify_df,
-)
+# from ITR.configs import LoggingConfig
+
 
 launch_uid = uuid4()
 

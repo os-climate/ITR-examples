@@ -1,12 +1,11 @@
-import pandas as pd
-import numpy as np
 import copy as copy
-
-# import random
-
 from collections import ChainMap
 
 import ITR
+import numpy as np
+import pandas as pd
+
+# import random
 
 
 def print_aggregations(aggregations):
@@ -173,8 +172,8 @@ def anonymize(portfolio, provider):
 
 
 def plot_grouped_heatmap(grouped_aggregations, analysis_parameters):
-    import matplotlib.pyplot as plt
     import matplotlib
+    import matplotlib.pyplot as plt
 
     timeframe, scopes, grouping = analysis_parameters
     timeframe = str(timeframe[0]).lower()
