@@ -1,65 +1,53 @@
 # Go to folder "examples" and run this app with `python ITR_UI.py` and
 # visit http://127.0.0.1:8050/ in your web browser
 
-import pandas as pd
-import numpy as np
-import json
-import pickle
-import os
-from pathlib import Path
-
-from uuid import uuid4
-
-# import base64
-import io
+import argparse
 
 # import warnings
 import ast
 
+# import base64
+import io
+import json
+import logging
+import os
+import pickle
+import sys
+from pathlib import Path
+from uuid import uuid4
+
 import dash
-from dash import html, dcc
-from dash import DiskcacheManager
-
 import dash_bootstrap_components as dbc  # should be installed separately
-
-from dash.dependencies import Input, Output, State
-from dash.exceptions import PreventUpdate
 import diskcache
+import ITR
+import numpy as np
+import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-
-import ITR
+from dash import DiskcacheManager, dcc, html
+from dash.dependencies import Input, Output, State
+from dash.exceptions import PreventUpdate
 from ITR import data_dir
-
-from ITR.configs import ITR_median, ITR_mean, ColumnsConfig, TemperatureScoreConfig
+from ITR.configs import ColumnsConfig, ITR_mean, ITR_median, TemperatureScoreConfig
+from ITR.data.base_providers import BaseProviderIntensityBenchmark, BaseProviderProductionBenchmark
 from ITR.data.data_warehouse import DataWarehouse
-from ITR.portfolio_aggregation import PortfolioAggregationMethod
-from ITR.temperature_score import TemperatureScore
-
-from ITR.data.base_providers import (
-    BaseProviderProductionBenchmark,
-    BaseProviderIntensityBenchmark,
-)
+from ITR.data.osc_units import Q_, asPintSeries, requantify_df_from_columns, ureg
 from ITR.data.template import TemplateProviderCompany
 from ITR.interfaces import (
     EScope,
-    ETimeFrames,
     EScoreResultType,
+    ETimeFrames,
     IEIBenchmarkScopes,
     IProductionBenchmarkScopes,
     ProjectionControls,
 )
-
-# from ITR.configs import LoggingConfig
-
-from ITR.data.osc_units import ureg, Q_, asPintSeries, requantify_df_from_columns
+from ITR.portfolio_aggregation import PortfolioAggregationMethod
+from ITR.temperature_score import TemperatureScore
 from pint import Quantity
 from pint_pandas import PintType
 
-import logging
+# from ITR.configs import LoggingConfig
 
-import sys
-import argparse
 
 launch_uid = uuid4()
 
