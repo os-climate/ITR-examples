@@ -30,6 +30,9 @@ python3 -m pip install --upgrade itr-examples
 Now you are ready to run the tool:
 ```
 itr-ui
+```
+You can also load specific content using the syntax:
+```
 itr-ui "data/20230106 ITR V2 Sample Data.xlsx"
 ```
 
