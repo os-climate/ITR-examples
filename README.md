@@ -21,18 +21,16 @@ On Windows, activate the environment with
 ```
 itr_ui\Scripts\activate
 ```
-Next, run:
+To install the tool (or upgrade to the latest release) run:
 ```
 python3 -m pip install --upgrade pip
-pip install -r requirements.txt
-pip install -e .
+python3 -m pip install --upgrade itr-examples
 ```
 
-Now you are ready to change to the examples directory and run the tool:
+Now you are ready to run the tool:
 ```
-cd examples
-python3 ITR_UI.py
-python3 ITR_UI.py "data/20230106 ITR V2 Sample Data.xlsx"
+itr-ui
+itr-ui "data/20230106 ITR V2 Sample Data.xlsx"
 ```
 
 Note the python commands are ```python``` for windows and ``python3`` for linux/mac.  If no file is specified, the tool uses a default, small ITR dataset.  With a filename given, the ITR tool will load data from that dataset.  The 20230106 data template has over 120 companies across nearly a dozen sectors.
@@ -52,28 +50,21 @@ jupyter-notebook
 ```
 
 ## Getting started for Contributors/Developers:
-If you use Anaconda environments, open an Anaconda prompt window, navigate to the project directory and run:
-```
-conda env create -f environment.yml
-conda activate itr_env
-```
 
-For virtual environments, open a command prompt/terminal window, navigate to the project directory and run:
-```
-python3 -m venv itr_env
-```
-On Unix or MacOS, activate the environment with
+If you haven't done so already, follow the installation instructions above.
+
+Make sure you have sourced the virtual environment using:
 ```
 source itr_env/bin/activate
 ```
-On Windows, activate the environment with
+...Or under Windows:
 ```
 itr_env\Scripts\activate
 ```
-Next, run:
+The commands below will upgrade to the latest release and install the components necessary for development:
 ```
 python3 -m pip install --upgrade pip
-pip install -r requirements.txt
+python3 -m pip install --upgrade itr-examples
 pip install -e .[dev]
 ```
 
