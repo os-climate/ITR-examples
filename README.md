@@ -77,5 +77,4 @@ pip install -r requirements.txt
 pip install -e .[dev]
 ```
 
-![](docs/ITR_demo.gif)
 ![docs/ITR_demo.gif](https://github.com/os-climate/ITR-examples/blob/main/docs/ITR_demo.gif)
