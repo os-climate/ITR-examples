@@ -36,7 +36,7 @@ from ITR.interfaces import (  # ICompanyEIProjectionsScopes,; ICompanyEIProjecti
 from plotly.subplots import make_subplots
 
 # from utils import DequantifyQuantity
-from .test_utils import assert_pint_series_equal, gen_company_data
+from .utils import assert_pint_series_equal, gen_company_data
 
 # from numpy.testing import assert_array_equal
 
