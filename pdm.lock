@@ -2,10 +2,10 @@
 # It is not intended for manual editing.
 
 [metadata]
-groups = ["default", "dev", "doc", "test", "tox"]
+groups = ["default", "dev", "doc", "test", "tox", "docs"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:d486dd236a3852dd6e25beda000d0d1d8574436c06d76f78af40f7ccf2740c29"
+content_hash = "sha256:d4bccb5bb781a0da3c808861b7e1f2743ee69ab6d0c6bd8e0a4097f257ae130c"
 
 [[package]]
 name = "alabaster"
@@ -135,6 +135,9 @@ name = "astroid"
 version = "3.0.1"
 requires_python = ">=3.8.0"
 summary = "An abstract syntax tree for Python with inference support."
+dependencies = [
+    "typing-extensions>=4.0.0; python_version < \"3.11\"",
+]
 files = [
     {file = "astroid-3.0.1-py3-none-any.whl", hash = "sha256:7d5895c9825e18079c5aeac0572bc2e4c83205c95d416e0b4fee8bc361d2d9ca"},
     {file = "astroid-3.0.1.tar.gz", hash = "sha256:86b0bb7d7da0be1a7c4aedb7974e391b32d4ed89e33de6ed6902b4b15c97577e"},
@@ -3236,6 +3239,19 @@ dependencies = [
 files = [
     {file = "sphinx_autodoc_typehints-1.24.1-py3-none-any.whl", hash = "sha256:4cc16c5545f2bf896ca52a854babefe3d8baeaaa033d13a7f179ac1d9feb02d5"},
     {file = "sphinx_autodoc_typehints-1.24.1.tar.gz", hash = "sha256:06683a2b76c3c7b1931b75e40e0211866fbb50ba4c4e802d0901d9b4e849add2"},
+]
+
+[[package]]
+name = "sphinx-copybutton"
+version = "0.5.2"
+requires_python = ">=3.7"
+summary = "Add a copy button to each of your code cells."
+dependencies = [
+    "sphinx>=1.8",
+]
+files = [
+    {file = "sphinx-copybutton-0.5.2.tar.gz", hash = "sha256:4cf17c82fb9646d1bc9ca92ac280813a3b605d8c421225fd9913154103ee1fbd"},
+    {file = "sphinx_copybutton-0.5.2-py3-none-any.whl", hash = "sha256:fb543fd386d917746c9a2c50360c7905b605726b9355cd26e9974857afeae06e"},
 ]
 
 [[package]]

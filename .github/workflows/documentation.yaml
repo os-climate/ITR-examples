@@ -36,7 +36,6 @@ jobs:
           pdm export -o requirements.txt
           if [ -f docs/requirements.txt ]; then
           pip install -r docs/requirements.txt; fi
-          cat /tmp/pdm-install-resolve*.log 1>&2
 
       - name: 'Build documentation: (tox/sphinx)'
         run: |
