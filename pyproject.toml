@@ -1,6 +1,6 @@
 [project]
 name = "ITR-examples"
-version = "v1.0.1"
+version = "v1.0.3"
 description = "Example code and user interface for the ITR project."
 authors = [
   { name = "Michael Tiemann", email = "72577720+MichaelTiemannOSC@users.noreply.github.com" },
