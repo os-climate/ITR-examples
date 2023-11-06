@@ -67,7 +67,7 @@ complete = { call = "tasks.complete:main", help = "Create autocomplete files for
 [tool.pdm.dev-dependencies]
 test = ["pdm-publish", "pytest-cov"]
 tox = ["tox", "tox-pdm>=0.5"]
-doc = ["sphinx"]
+doc = ["sphinx", "sphinx-copybutton"]
 dev = ["tox>=4.11.3", "tox-pdm>=0.7.0"]
 
 [tool.pytest.ini_options]
