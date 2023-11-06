@@ -2206,7 +2206,7 @@ def update_graph(
         df_for_output_table[col] = ITR.nominal_values(df_for_output_table[col].pint.m).round(2)  # f"{q:.2f~#P}"
         # pd.to_numeric(...).round(2)
     df_for_output_table["investment_value"] = df_for_output_table["investment_value"].apply(
-        lambda x: "${:,.1f} Mn".format((x / 1000000))
+        lambda x: "${:,.1f} Mn".format(x / 1000000)
     )  # formating column
     df_for_output_table["scope"] = df_for_output_table["scope"].map(str)
     df_for_output_table.rename(
