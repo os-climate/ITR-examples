@@ -55,6 +55,9 @@ Documentation = "https://github.com/os-climate/ITR-examples/tree/main/docs"
 requires = ["pdm-backend"]
 build-backend = "pdm.backend"
 
+[tool.isort]
+profile = "black"
+
 [tool.pdm.scripts]
 pre_release = "scripts/dev-versioning.sh"
 release = "scripts/release-versioning.sh"
@@ -67,7 +70,7 @@ complete = { call = "tasks.complete:main", help = "Create autocomplete files for
 [tool.pdm.dev-dependencies]
 test = ["pdm-publish", "pytest-cov"]
 tox = ["tox", "tox-pdm>=0.5"]
-doc = ["sphinx"]
+doc = ["sphinx", "sphinx-copybutton"]
 dev = ["tox>=4.11.3", "tox-pdm>=0.7.0"]
 
 [tool.pytest.ini_options]

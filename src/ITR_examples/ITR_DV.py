@@ -26,7 +26,10 @@ from dash import DiskcacheManager, dcc, html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 from ITR.configs import ITR_mean, ITR_median
-from ITR.data.base_providers import BaseProviderIntensityBenchmark, BaseProviderProductionBenchmark
+from ITR.data.base_providers import (
+    BaseProviderIntensityBenchmark,
+    BaseProviderProductionBenchmark,
+)
 from ITR.data.data_warehouse import DataWarehouse
 from ITR.data.osc_units import Q_, asPintSeries, requantify_df_from_columns, ureg
 from ITR.data.template import TemplateProviderCompany
