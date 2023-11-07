@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "test", "tox"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:ce615bbc7ba7bc3024fc0b65258f58a42de6b2e04c13649b0be122c650da01b2"
+content_hash = "sha256:0b9faf4bfbe6c1935ba4fcf43fb21c4bb4d7220a10d62178ed3583b83ef98976"
 
 [[package]]
 name = "alabaster"
@@ -135,9 +135,6 @@ name = "astroid"
 version = "3.0.1"
 requires_python = ">=3.8.0"
 summary = "An abstract syntax tree for Python with inference support."
-dependencies = [
-    "typing-extensions>=4.0.0; python_version < \"3.11\"",
-]
 files = [
     {file = "astroid-3.0.1-py3-none-any.whl", hash = "sha256:7d5895c9825e18079c5aeac0572bc2e4c83205c95d416e0b4fee8bc361d2d9ca"},
     {file = "astroid-3.0.1.tar.gz", hash = "sha256:86b0bb7d7da0be1a7c4aedb7974e391b32d4ed89e33de6ed6902b4b15c97577e"},
@@ -2146,20 +2143,6 @@ dependencies = [
     "truststore; python_version >= \"3.10\"",
     "unearth>=0.12.1",
     "virtualenv>=20",
-]
-files = [
-    {file = "pdm-2.10.1-py3-none-any.whl", hash = "sha256:2b2853b83830ed110a8a1eb3feb62cf4e55165de4809a5278bc9453c788898d3"},
-    {file = "pdm-2.10.1.tar.gz", hash = "sha256:d166531c659fc4905933546544dd2e16cf648c2ba6d898c82126ad6a42117a81"},
-]
-
-[[package]]
-name = "pdm"
-version = "2.10.1"
-extras = ["publish"]
-requires_python = ">=3.7"
-summary = "A modern Python package and dependency manager supporting the latest PEP standards"
-dependencies = [
-    "pdm==2.10.1",
 ]
 files = [
     {file = "pdm-2.10.1-py3-none-any.whl", hash = "sha256:2b2853b83830ed110a8a1eb3feb62cf4e55165de4809a5278bc9453c788898d3"},
