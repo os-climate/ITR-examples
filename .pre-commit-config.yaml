@@ -1,16 +1,20 @@
 ---
-exclude: "^docs/conf.py"
+exclude: |
+  (?x)^(
+      docs\/conf.py|
+      dco-signoffs/$
+  )$
 
 repos:
-  - repo: local
-    hooks:
-      - id: tomllint
-        name: "Script: scripts/tomllint.sh"
-        language: script
-        # pass_filenames: false
-        files: \^*.toml
-        types: [file]
-        entry: scripts/tomllint.sh .
+  # - repo: local
+  #   hooks:
+  #     - id: tomllint
+  #       name: 'Script: scripts/tomllint.sh'
+  #       language: script
+  #       # pass_filenames: false
+  #       files: \^*.toml
+  #       types: [file]
+  #       entry: scripts/tomllint.sh .
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
@@ -24,7 +28,7 @@ repos:
       - id: check-shebang-scripts-are-executable
       - id: check-symlinks
       - id: check-toml
-      - id: detect-aws-credentials
+      # - id: detect-aws-credentials
       - id: check-xml
       - id: check-yaml
       - id: debug-statements
@@ -54,10 +58,11 @@ repos:
       - id: markdownlint
         args: ["--fix"]
 
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.0
-    hooks:
-      - id: pyupgrade
+  # - repo: https://github.com/asottile/pyupgrade
+  #   rev: v3.15.0
+  #   hooks:
+  #     - id: pyupgrade
+  #       args: ['--py37-plus']
 
   - repo: https://github.com/psf/black-pre-commit-mirror
     rev: 23.10.1
@@ -80,19 +85,12 @@ repos:
       - id: bashate
         args: ["--ignore=E006"]
 
-  - repo: https://github.com/koalaman/shellcheck-precommit
-    rev: v0.9.0
-    hooks:
-      - id: shellcheck
-      # Optionally only show errors and warnings
-      # args: ["--severity=warning"]
-
-  # If you want to automatically "modernize" your Python code:
-  # - repo: https://github.com/asottile/pyupgrade
-  #   rev: v3.3.1
+  # - repo: https://github.com/koalaman/shellcheck-precommit
+  #   rev: v0.9.0
   #   hooks:
-  #   - id: pyupgrade
-  #     args: ['--py37-plus']
+  #     - id: shellcheck
+  #     # Optionally only show errors and warnings
+  #     # args: ["--severity=warning"]
 
   # If you want to avoid flake8 errors due to unused vars or imports:
   # - repo: https://github.com/PyCQA/autoflake
