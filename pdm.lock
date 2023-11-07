@@ -1185,7 +1185,7 @@ files = [
 
 [[package]]
 name = "itr"
-version = "1.0.10"
+version = "1.0.11"
 requires_python = ">=3.9"
 summary = "Assess the temperature alignment of current targets, commitments, and investment and lending portfolios."
 dependencies = [
@@ -1217,8 +1217,8 @@ dependencies = [
     "xlrd==2.0.1",
 ]
 files = [
-    {file = "itr-1.0.10-py3-none-any.whl", hash = "sha256:155f20207772a351612a0953ff50ac4321307efc41b42fbb1c69e7d9b4695c6b"},
-    {file = "itr-1.0.10.tar.gz", hash = "sha256:eda1eebf2a7d54d1e32773c7d3403b5911560404e9e0e4979af3e7c1baa2d26c"},
+    {file = "itr-1.0.11-py3-none-any.whl", hash = "sha256:c7cf3eab4e8d736c27a0578011c74890dd5aa184eb816fd3127b20a125a097ce"},
+    {file = "itr-1.0.11.tar.gz", hash = "sha256:ce13489abcdf08424eec8f658e286644f75e51cb0098c78104e2fcf93c547be8"},
 ]
 
 [[package]]
