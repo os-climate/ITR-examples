@@ -1,6 +1,4 @@
 ---
----
-# Run all notebooks on every push
 name: "💵 Check billing status"
 
 # yamllint disable-line rule:truthy
