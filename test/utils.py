@@ -2,7 +2,6 @@ import json
 import random
 import unittest
 
-import ITR
 import pandas as pd
 
 # from pint_pandas import PintType
@@ -10,6 +9,8 @@ from ITR.data.osc_units import EI_Metric, EI_Quantity
 from ITR.interfaces import ICompanyData  # ICompanyEIProjections,
 from ITR.interfaces import EScope, ICompanyEIProjection, ICompanyEIProjectionsScopes
 from pint import Quantity
+
+import ITR
 
 
 class ITR_Encoder(json.JSONEncoder):

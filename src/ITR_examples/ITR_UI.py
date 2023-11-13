@@ -19,7 +19,6 @@ from uuid import uuid4
 import dash
 import dash_bootstrap_components as dbc  # should be installed separately
 import diskcache
-import ITR
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -27,7 +26,6 @@ import plotly.graph_objects as go
 from dash import DiskcacheManager, dcc, html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-from ITR import data_dir
 from ITR.configs import ColumnsConfig, ITR_mean, ITR_median, TemperatureScoreConfig
 from ITR.data.base_providers import (
     BaseProviderIntensityBenchmark,
@@ -48,6 +46,9 @@ from ITR.portfolio_aggregation import PortfolioAggregationMethod
 from ITR.temperature_score import TemperatureScore
 from pint import Quantity
 from pint_pandas import PintType
+
+import ITR
+from ITR import data_dir
 
 # from ITR.configs import LoggingConfig
 

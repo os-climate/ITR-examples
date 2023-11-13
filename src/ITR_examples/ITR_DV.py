@@ -16,7 +16,6 @@ from uuid import uuid4
 import dash
 import dash_bootstrap_components as dbc  # should be installed separately
 import diskcache
-import ITR
 import numpy as np
 import osc_ingest_trino as osc
 import pandas as pd
@@ -51,6 +50,8 @@ from ITR.portfolio_aggregation import PortfolioAggregationMethod
 from ITR.temperature_score import TemperatureScore
 from pint import Quantity
 from pint_pandas import PintType
+
+import ITR
 
 from .. import data_dir
 

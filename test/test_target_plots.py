@@ -3,11 +3,9 @@ import os
 import re
 import unittest
 
-import ITR
 import numpy as np
 import pandas as pd
 import plotly.express as px
-from ITR import data_dir
 
 # from ITR.data.osc_units import ureg
 from ITR.configs import ColumnsConfig
@@ -34,6 +32,9 @@ from ITR.interfaces import (  # ICompanyEIProjectionsScopes,; ICompanyEIProjecti
 
 # https://stackoverflow.com/a/62853540/1291237
 from plotly.subplots import make_subplots
+
+import ITR
+from ITR import data_dir
 
 # from utils import DequantifyQuantity
 from .utils import assert_pint_series_equal, gen_company_data
