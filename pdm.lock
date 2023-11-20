@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "test", "tox"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:0b9faf4bfbe6c1935ba4fcf43fb21c4bb4d7220a10d62178ed3583b83ef98976"
+content_hash = "sha256:b6b1e987f0ff3dbb3caa1f5d5d7cdb2b2d90c30189511def93595b18aa1e4f19"
 
 [[package]]
 name = "alabaster"
@@ -702,25 +702,27 @@ files = [
 
 [[package]]
 name = "dash"
-version = "2.11.1"
+version = "2.14.1"
 requires_python = ">=3.6"
 summary = "A Python framework for building reactive web-apps. Developed by Plotly."
 dependencies = [
-    "Flask<2.3.0,>=1.0.4",
-    "Werkzeug<2.3.0",
+    "Flask<3.1,>=1.0.4",
+    "Werkzeug<3.1",
     "ansi2html",
     "dash-core-components==2.0.0",
     "dash-html-components==2.0.0",
     "dash-table==5.0.0",
+    "importlib-metadata; python_version >= \"3.7\"",
     "nest-asyncio",
     "plotly>=5.0.0",
     "requests",
     "retrying",
+    "setuptools",
     "typing-extensions>=4.1.1",
 ]
 files = [
-    {file = "dash-2.11.1-py3-none-any.whl", hash = "sha256:a5b55efc7f139538d95331fa0b5ee0d21600f7dafa9cce4fe4f887b773aba01a"},
-    {file = "dash-2.11.1.tar.gz", hash = "sha256:1acc4c634311cb306a1086fff315c1f2aaa3898bac362d93bc8db6b1a6474e5c"},
+    {file = "dash-2.14.1-py3-none-any.whl", hash = "sha256:ce440ef7416945c9daa8274948483a0aac928a4fec768c0384fd4e9a6196eaf2"},
+    {file = "dash-2.14.1.tar.gz", hash = "sha256:93dc9d665ec5d3720647d4cef4520a1c7cd1bde57e893ffeb7e6cd59781d3294"},
 ]
 
 [[package]]
@@ -3660,15 +3662,15 @@ files = [
 
 [[package]]
 name = "werkzeug"
-version = "2.2.3"
-requires_python = ">=3.7"
+version = "3.0.1"
+requires_python = ">=3.8"
 summary = "The comprehensive WSGI web application library."
 dependencies = [
     "MarkupSafe>=2.1.1",
 ]
 files = [
-    {file = "Werkzeug-2.2.3-py3-none-any.whl", hash = "sha256:56433961bc1f12533306c624f3be5e744389ac61d722175d543e1751285da612"},
-    {file = "Werkzeug-2.2.3.tar.gz", hash = "sha256:2e1ccc9417d4da358b9de6f174e3ac094391ea1d4fbef2d667865d819dfd0afe"},
+    {file = "werkzeug-3.0.1-py3-none-any.whl", hash = "sha256:90a285dc0e42ad56b34e696398b8122ee4c681833fb35b8334a095d82c56da10"},
+    {file = "werkzeug-3.0.1.tar.gz", hash = "sha256:507e811ecea72b18a404947aded4b3390e1db8f826b494d76550ef45bb3b1dcc"},
 ]
 
 [[package]]
