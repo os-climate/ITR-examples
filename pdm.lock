@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "test", "tox"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:b6b1e987f0ff3dbb3caa1f5d5d7cdb2b2d90c30189511def93595b18aa1e4f19"
+content_hash = "sha256:040c71783122b68ee6506b21dfd0bea57fc6e043e72f9bc148447d3ca5ddcc37"
 
 [[package]]
 name = "alabaster"
@@ -135,6 +135,9 @@ name = "astroid"
 version = "3.0.1"
 requires_python = ">=3.8.0"
 summary = "An abstract syntax tree for Python with inference support."
+dependencies = [
+    "typing-extensions>=4.0.0; python_version < \"3.11\"",
+]
 files = [
     {file = "astroid-3.0.1-py3-none-any.whl", hash = "sha256:7d5895c9825e18079c5aeac0572bc2e4c83205c95d416e0b4fee8bc361d2d9ca"},
     {file = "astroid-3.0.1.tar.gz", hash = "sha256:86b0bb7d7da0be1a7c4aedb7974e391b32d4ed89e33de6ed6902b4b15c97577e"},
