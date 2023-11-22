@@ -52,7 +52,7 @@ from ITR.temperature_score import TemperatureScore
 from pint import Quantity
 from pint_pandas import PintType
 
-from .. import data_dir
+from . import data_dir
 
 # import base64
 
@@ -2085,7 +2085,7 @@ def update_graph(
     agg_temp_scores = [agg_score(i) for i in PortfolioAggregationMethod]
     methods, scores = list(map(list, zip(*agg_temp_scores)))
     if ITR.HAS_UNCERTAINTIES:
-        scores_n, scores_s = [
+        scores_n, scores_s = [  # type: ignore
             *map(
                 list,
                 zip(

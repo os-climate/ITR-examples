@@ -9,11 +9,11 @@ else:
 
 import pathlib
 
-data_dir = ""
+data_dir = pathlib.Path("")
 # import sysconfig
 # print(sysconfig.get_paths()["purelib"])
 
-if data_dir == "":
+if data_dir == pathlib.Path(""):
     data_dir = pathlib.Path(__file__).parent.parent / "data"
 else:
     # Validate data_dir

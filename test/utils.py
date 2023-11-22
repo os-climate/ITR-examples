@@ -4,12 +4,19 @@ import unittest
 
 import ITR
 import pandas as pd
-
-# from pint_pandas import PintType
 from ITR.data.osc_units import EI_Metric, EI_Quantity
-from ITR.interfaces import ICompanyData  # ICompanyEIProjections,
-from ITR.interfaces import EScope, ICompanyEIProjection, ICompanyEIProjectionsScopes
+from ITR.interfaces import (
+    EScope,
+    ICompanyData,
+    ICompanyEIProjection,
+    ICompanyEIProjections,
+    ICompanyEIProjectionsScopes,
+)
+
+# isort: split
+
 from pint import Quantity
+from pint_pandas import PintType
 
 
 class ITR_Encoder(json.JSONEncoder):
@@ -41,7 +48,7 @@ class DequantifyQuantity(json.JSONEncoder):
 
 
 def assert_pint_series_equal(
-    case: unittest.case,
+    case: unittest.case.TestCase,
     left: pd.Series,
     right: pd.Series,
     places=7,
@@ -72,7 +79,7 @@ def assert_pint_series_equal(
 
 
 def assert_pint_frame_equal(
-    case: unittest.case,
+    case: unittest.case.TestCase,
     left: pd.DataFrame,
     right: pd.DataFrame,
     places=7,
