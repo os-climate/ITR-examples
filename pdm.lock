@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "test", "tox"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:e25eadae26930a21b9cdb0683b8b9e8c3b26d866e8d3cb684d9cdfecb3960112"
+content_hash = "sha256:06aa285627c7d11e28e1af5d9a3012fbd447656d146a013c26b93922b3188668"
 
 [[package]]
 name = "alabaster"

@@ -17,7 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = "ITR Temperature Alignment tool"
+project = "ITR Temperature Alignment Examples"
 copyright = "2023, OS-Climate"
 author = "Ortec Finance"
 
@@ -64,7 +64,7 @@ html_context = {
 }
 
 # -- Auto API
-autoapi_dirs = ["../ITR"]
+autoapi_dirs = ["../ITR-examples"]
 autoapi_type = "python"
 autoapi_template_dir = "_autoapi_templates"
 
