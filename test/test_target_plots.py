@@ -2,6 +2,7 @@ import json
 import os
 import re
 import unittest
+import warnings
 
 import ITR
 import numpy as np
@@ -1011,15 +1012,18 @@ class TestTargets(unittest.TestCase):
         )
 
         company_data = [company_ag, company_ah, company_ai, company_aj]
-        company_dict = {
-            field: [getattr(c, field) for c in company_data]
-            for field in [
-                ColumnsConfig.BASE_YEAR_PRODUCTION,
-                ColumnsConfig.GHG_SCOPE12,
-                ColumnsConfig.SECTOR,
-                ColumnsConfig.REGION,
-            ]
-        }
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            company_dict = {
+                ColumnsConfig.BASE_YEAR_PRODUCTION: np.array(
+                    [getattr(c, ColumnsConfig.BASE_YEAR_PRODUCTION) for c in company_data], dtype="object"
+                ),
+                ColumnsConfig.GHG_SCOPE12: PA_(
+                    [getattr(c, ColumnsConfig.GHG_SCOPE12).m_as("Mt CO2e") for c in company_data], dtype="Mt CO2e"
+                ),
+                ColumnsConfig.SECTOR: [getattr(c, ColumnsConfig.SECTOR) for c in company_data],
+                ColumnsConfig.REGION: [getattr(c, ColumnsConfig.REGION) for c in company_data],
+            }
         company_index = [c.company_id for c in company_data]
         company_sector_region_info = pd.DataFrame(company_dict, pd.Index(company_index, name="company_id"))
         company_sector_region_info[ColumnsConfig.SCOPE] = [EScope.S1S2] * len(company_sector_region_info)
@@ -1687,7 +1691,7 @@ class TestTargets(unittest.TestCase):
 
         self.base_company_data = BaseCompanyDataProvider(company_data)
         # Since we are not using a Data Warehouse to compute our graphics, we have to do this projection manually, with the benchmark's internal dataframe.
-        self.base_company_data._validate_projected_trajectories(self.base_company_data._companies, ei_df_t)
+        self.base_company_data._validate_projected_trajectories(self.base_company_data._companies, self.OECM_EI_S3_bm)
 
         co_pp = bm_production_data.droplevel("scope")
 
