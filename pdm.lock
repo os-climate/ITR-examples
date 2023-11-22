@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "test", "tox"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:040c71783122b68ee6506b21dfd0bea57fc6e043e72f9bc148447d3ca5ddcc37"
+content_hash = "sha256:06aa285627c7d11e28e1af5d9a3012fbd447656d146a013c26b93922b3188668"
 
 [[package]]
 name = "alabaster"
@@ -1190,7 +1190,7 @@ files = [
 
 [[package]]
 name = "itr"
-version = "1.0.12"
+version = "1.1.0"
 requires_python = ">=3.9"
 summary = "Assess the temperature alignment of current targets, commitments, and investment and lending portfolios."
 dependencies = [
@@ -1222,8 +1222,8 @@ dependencies = [
     "xlrd==2.0.1",
 ]
 files = [
-    {file = "itr-1.0.12-py3-none-any.whl", hash = "sha256:432b9e9fada613dcae09ccf7d6780b6b98e57fb2ecb214c544302a374b6d8654"},
-    {file = "itr-1.0.12.tar.gz", hash = "sha256:33cf973ecc1cb1439616adab1daa2554a73f086eff302280634e6ee9034f76cc"},
+    {file = "itr-1.1.0-py3-none-any.whl", hash = "sha256:44fcf480c81ec0af66cda9f3ef5db497050a9a028ad14b129b29986b284e0132"},
+    {file = "itr-1.1.0.tar.gz", hash = "sha256:c4a23f92ea4a8fe209a07e19e16e8e655c04932c1258ffe86ab51fcd69318c28"},
 ]
 
 [[package]]
