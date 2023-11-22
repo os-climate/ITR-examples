@@ -67,9 +67,13 @@ logger.info("Start!")
 cache = diskcache.Cache("./.webassets-cache")
 background_callback_manager = DiskcacheManager(cache, cache_by=[lambda: launch_uid], expire=600)
 
-# Some variables to control whether we use background caching or not.  Cannot use with vault nor breakpoints.
+# Some variables to control whether we use background caching or not.
+# We cannot use background caching with vault nor breakpoints.
 have_breakpoint = False
 use_data_vault = False
+
+# Default Dash port is 8050, but can use 8051 if we want to run two side-by-side
+port_number = 8050
 
 root = Path(__file__).parent
 
@@ -1905,13 +1909,13 @@ def update_graph(
         aggregated_scores = temperature_score.aggregate_scores(filt_df)
         agg_zero = Q_(0.0, "delta_degC")
         agg_score = agg_zero
-        if aggregated_scores.long.S1S2:
+        if not aggregated_scores.long.S1S2.empty():
             agg_score = aggregated_scores.long.S1S2.all.score
-        elif aggregated_scores.long.S1:
+        elif not aggregated_scores.long.S1.empty():
             agg_score = aggregated_scores.long.S1.all.score
-        if aggregated_scores.long.S1S2S3:
+        if not aggregated_scores.long.S1S2S3.empty():
             agg_score = agg_score + aggregated_scores.long.S1S2S3.all.score
-        elif aggregated_scores.long.S3:
+        elif not aggregated_scores.long.S3.empty():
             agg_score = agg_score + aggregated_scores.long.S3.all.score
         elif agg_score == agg_zero:
             return [agg_method.value, Q_(np.nan, "delta_degC")]
@@ -1920,7 +1924,7 @@ def update_graph(
     agg_temp_scores = [agg_score(i) for i in PortfolioAggregationMethod]
     methods, scores = list(map(list, zip(*agg_temp_scores)))
     if ITR.HAS_UNCERTAINTIES:
-        scores_n, scores_s = [
+        scores_n, scores_s = [  # type: ignore
             *map(
                 list,
                 zip(
@@ -2064,15 +2068,15 @@ def update_graph(
     )
 
     # FIXME: this is utter confusion with respect to scopes!
-    if aggregated_scores.long.S1S2:
+    if not aggregated_scores.long.S1S2.empty():
         scores = aggregated_scores.long.S1S2.all.score.m
-    elif aggregated_scores.long.S1:
+    elif not aggregated_scores.long.S1.empty():
         scores = aggregated_scores.long.S1.all.score.m
-    elif aggregated_scores.long.S1S2S3:
+    elif not aggregated_scores.long.S1S2S3.empty():
         scores = aggregated_scores.long.S1S2S3.all.score.m
-    elif aggregated_scores.long.S3:
+    elif not aggregated_scores.long.S3.empty():
         scores = aggregated_scores.long.S3.all.score.m
-    elif aggregated_scores.long.S2:
+    elif not aggregated_scores.long.S2.empty():
         scores = aggregated_scores.long.S2.all.score.m
     else:
         raise ValueError("No aggregated scores")
@@ -2231,8 +2235,8 @@ def spinner_concentrator(*_):
 
 
 if __name__ == "__main__":
-    app.run_server(use_reloader=False, debug=True)
+    app.run_server(use_reloader=False, debug=True, port=port_number)
 
 
 def main():
-    app.run_server(use_reloader=False, debug=True)
+    app.run_server(use_reloader=False, debug=True, port=port_number)
