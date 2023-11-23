@@ -45,3 +45,7 @@ jobs:
         with:
           ignore-vulns: |
             PYSEC-2023-163
+
+# Name | Version | ID |
+# --- | --- | --- | --- | ---
+# numexpr | 2.8.7 | PYSEC-2023-163 |
