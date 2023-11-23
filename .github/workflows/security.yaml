@@ -26,6 +26,8 @@ jobs:
 
       - name: "Setup PDM for build commands"
         uses: pdm-project/setup-pdm@v3
+        with:
+          version: 2.10.0
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
@@ -39,9 +41,14 @@ jobs:
           pdm export -o requirements.txt
           python -m pip install -r requirements.txt
           python -m pip install .
+          pdm list --graph
 
       - name: "Run: pip-audit"
         uses: pypa/gh-action-pip-audit@v1.0.8
         with:
           ignore-vulns: |
             PYSEC-2023-163
+
+  # Name | Version | ID |
+  # --- | --- | --- | --- | ---
+  # numexpr | 2.8.7 | PYSEC-2023-163 |
