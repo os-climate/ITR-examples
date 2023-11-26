@@ -1026,7 +1026,9 @@ app.layout = dbc.Container(  # always start with container
     prevent_initial_call=False,
 )
 def warehouse_new(banner_title):
-    # load company data
+    """
+    Load initial corporate data file
+    """
     if use_data_vault:
         Warehouse = vault_warehouse
         return ("warehouse", True, "Spin-warehouse")
@@ -1727,7 +1729,11 @@ select cd.company_id, cd.sector, cd.region, ts.scope, cd.company_name,
        cumulative_trajectory, cumulative_trajectory_units,
        cumulative_target, cumulative_target_units,
        trajectory_temperature_score as trajectory_score,
-       target_temperature_score as target_score
+       trajectory_overshoot_ratio,  -- dimensionless
+       target_temperature_score as target_score,
+       target_overshoot_ratio,  -- dimensionless
+       format('%.5f %s', cb.benchmark_temp, cb.benchmark_temp_units) as benchmark_temperature,
+       format('%d %s', cb.global_budget, cb.global_budget_units) as benchmark_global_budget
 from {itr_prefix}temperature_scores ts
        join {itr_prefix}production_data pd on ts.company_id=pd.company_id
        join {itr_prefix}emissions_data co2 on ts.company_id=co2.company_id
@@ -1779,6 +1785,9 @@ where pd.year=2019 and co2.year=2019"""
             scopes=None,  # None means "use the appropriate scopes for the benchmark
             # Options for the aggregation method are WATS, TETS, AOTS, MOTS, EOTS, ECOTS, and ROTS
             aggregation_method=PortfolioAggregationMethod.WATS,
+            budget_column=ColumnsConfig.CUMULATIVE_SCALED_BUDGET
+            if budget_meth == "contraction"
+            else ColumnsConfig.CUMULATIVE_BUDGET,
         )
 
         if "target_probability" in changed_id:
@@ -1803,6 +1812,7 @@ def quantify_col(df: pd.DataFrame, col: str, unit=None):
         return asPintSeries(df[col].map(Q_))
     if not unit.startswith("pint["):
         unit = f"pint[{unit}]"
+    # Fix up data coming back from JSON
     return df[col].replace("<NA>", "nan", regex=True).map(Q_).astype(unit)
 
 
@@ -1983,7 +1993,7 @@ def update_graph(
     # Covered companies analysis; if we pre-filter portfolio-df, then we'll never have "uncovered" companies here
     coverage = filt_df.reset_index("company_id")[["company_id", "scope", "ghg_s1s2", "ghg_s3", "cumulative_target"]]
     coverage["ghg"] = coverage.apply(
-        lambda x: x.ghg_s1s2 + x.ghg_s3
+        lambda x: (x.ghg_s1s2 + x.ghg_s3 if not pd.isna(x.ghg_s3) else PintType(x.ghg_s3.u).na_value)
         if x.scope == EScope.S1S2S3
         else x.ghg_s3
         if x.scope == EScope.S3
