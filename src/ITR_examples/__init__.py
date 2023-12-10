@@ -9,15 +9,10 @@ else:
 
 import pathlib
 
-data_dir = pathlib.Path("")
 # import sysconfig
 # print(sysconfig.get_paths()["purelib"])
 
-if data_dir == pathlib.Path(""):
-    data_dir = pathlib.Path(__file__).parent.parent / "data"
-else:
-    # Validate data_dir
-    pass
+data_dir = pathlib.Path(__file__).parent / "data"
 
 try:
     # Change here if project is renamed and does not equal the package name

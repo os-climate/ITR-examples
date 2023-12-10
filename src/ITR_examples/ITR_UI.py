@@ -5,8 +5,6 @@ import argparse
 
 # import warnings
 import ast
-
-# import base64
 import io
 import json
 import logging
@@ -981,7 +979,9 @@ app.layout = dbc.Container(  # always start with container
     prevent_initial_call=False,
 )
 def warehouse_new(banner_title):
-    # load company data
+    """
+    Load initial corporate data file
+    """
     template_company_data = TemplateProviderCompany(company_data_path, projection_controls=ProjectionControls())
     Warehouse = DataWarehouse(
         template_company_data,
@@ -1023,15 +1023,15 @@ def recalculate_individual_itr(warehouse_pickle_json, eibm, proj_meth, winz, bm_
     :param proj_meth: Trajectory projection method (median or mean)
     :param winz: Winsorization parameters (limit of outlier data)
     """
-    changed_id = [p["prop_id"] for p in dash.callback_context.triggered][0]  # to catch which widgets were pressed
+    changed_ids = [p["prop_id"] for p in dash.callback_context.triggered]  # to catch which widgets were pressed
     Warehouse = pickle.loads(ast.literal_eval(json.loads(warehouse_pickle_json)))
 
-    if "scenarios-cutting" in changed_id or "projection-method" in changed_id:  # if winzorization params were changed
+    if "scenarios-cutting" in changed_ids or "projection-method" in changed_ids:  # if winzorization params were changed
         Warehouse.company_data.projection_controls.TREND_CALC_METHOD = ITR_median if proj_meth == "median" else ITR_mean
         Warehouse.company_data.projection_controls.LOWER_PERCENTILE = winz[0] / 100
         Warehouse.company_data.projection_controls.UPPER_PERCENTILE = winz[1] / 100
 
-    if "eibm-dropdown" in changed_id or Warehouse.benchmarks_projected_ei is None:
+    if "eibm-dropdown" in changed_ids or Warehouse.benchmarks_projected_ei is None:
         show_oecm_bm = "no"
         if eibm == "OECM_PC":
             benchmark_file = benchmark_EI_OECM_PC_file
@@ -1072,7 +1072,7 @@ def recalculate_individual_itr(warehouse_pickle_json, eibm, proj_meth, winz, bm_
         Warehouse.update_benchmarks(base_production_bm, EI_bm)
         bm_region = eibm
 
-    elif "scenarios-cutting" in changed_id or "projection-method" in changed_id:
+    elif "scenarios-cutting" in changed_ids or "projection-method" in changed_ids:
         # Trajectories are company-specific, but ultimately do depend on benchmarks (for units/scopes)
         Warehouse.update_trajectories()
 
@@ -1219,6 +1219,7 @@ def recalculate_warehouse_target_year(warehouse_pickle_json, target_year, sector
     ),  # fake for spinner
     inputs=(
         Input("warehouse-ty", "data"),
+        Input("target-year", "value"),
         Input("sector-dropdown-ty", "value"),
         Input("sector-value-ty", "value"),
         Input("region-dropdown-ty", "value"),
@@ -1237,6 +1238,7 @@ def recalculate_warehouse_target_year(warehouse_pickle_json, target_year, sector
 )
 def recalculate_target_year_ts(
     warehouse_pickle_json,
+    target_year,
     sectors_ty,
     sector_ty,
     regions_ty,
@@ -1427,7 +1429,7 @@ def recalculate_target_year_ts(
             sector_ts = "+"
         regions_dl = [{"label": r, "value": r} for r in sorted(regions)] + [{"label": "All Regions", "value": ""}]
         if region_ts == "+" or (region == "" and pf_bm_regions - regions):
-            regions_dl.insert(-1, {"label": f"All Regions (in sectors)", "value": "+"})
+            regions_dl.insert(-1, {"label": "All Regions (in sectors)", "value": "+"})
             region = ""
             region_ts = "+"
         scopes_dl = [{"label": s.name, "value": s.name} for s in sorted(scopes)] + [
@@ -1523,6 +1525,7 @@ def recalculate_target_year_ts(
             # We are in TPI
             target_year_cum_co2 = get_co2_in_sectors_region_scope(prod_bm, df_ei_t, sectors, bm_region, scope_list)
 
+        assert EI_bm.projection_controls.TARGET_YEAR == target_year
         assert EI_bm.projection_controls.TARGET_YEAR in target_year_cum_co2.index
 
     total_target_co2 = target_year_cum_co2.loc[EI_bm.projection_controls.TARGET_YEAR]
@@ -1531,7 +1534,7 @@ def recalculate_target_year_ts(
         target_year_1e = target_year_1e_cum_co2.loc[EI_bm.projection_controls.TARGET_YEAR]
     if target_year_2e_cum_co2 is not None:
         target_year_2e = target_year_2e_cum_co2.loc[EI_bm.projection_controls.TARGET_YEAR]
-    ts_cc = ITR.configs.TemperatureScoreConfig.CONTROLS_CONFIG
+    ts_cc = TemperatureScoreConfig.CONTROLS_CONFIG
     # FIXME: Note that we cannot use ts_cc.scenario_target_temperature because that doesn't track the benchmark value
     # And we cannot make it track the benchmark value because then it becomes another global variable that would break Dash.
     target_year_ts = EI_bm._benchmark_temperature + (total_target_co2 - total_final_co2) * ts_cc.tcre_multiplier
@@ -1603,12 +1606,13 @@ def bm_budget_year_target(show_oecm, target_year, bm_end_use_budget, bm_1e_budge
     ),  # fake for spinner
     inputs=(
         Input("warehouse-ty", "data"),
+        Input("target-year", "value"),
         Input("budget-method", "value"),
         Input("target_probability", "value"),  # winzorization slider
     ),
     prevent_initial_call=True,
 )
-def calc_temperature_score(warehouse_pickle_json, budget_meth, target_probability, *_):
+def calc_temperature_score(warehouse_pickle_json, target_year: int, budget_meth: str, target_probability: float, *_):
     """
     Calculate temperature scores according to the carbon budget methodology
     :param warehouse_pickle_json: Pickled JSON version of Warehouse containing only company data
@@ -1616,7 +1620,7 @@ def calc_temperature_score(warehouse_pickle_json, budget_meth, target_probabilit
     """
     global companies
 
-    changed_id = [p["prop_id"] for p in dash.callback_context.triggered][0]  # to catch which widgets were pressed
+    changed_ids = [p["prop_id"] for p in dash.callback_context.triggered]  # to catch which widgets were pressed
     Warehouse = pickle.loads(ast.literal_eval(json.loads(warehouse_pickle_json)))
 
     temperature_score = TemperatureScore(
@@ -1629,11 +1633,11 @@ def calc_temperature_score(warehouse_pickle_json, budget_meth, target_probabilit
         else ColumnsConfig.CUMULATIVE_BUDGET,
     )
 
-    if "target_probability" in changed_id:
+    if "target_probability" in changed_ids:
         df = temperature_score.calculate(
             data_warehouse=Warehouse,
             portfolio=companies,
-            target_probability=target_probability / 100,
+            target_probability=target_probability / 100.0,
         )
     else:
         df = temperature_score.calculate(data_warehouse=Warehouse, portfolio=companies)
@@ -1650,6 +1654,7 @@ def quantify_col(df: pd.DataFrame, col: str, unit=None):
         return asPintSeries(df[col].map(Q_))
     if not unit.startswith("pint["):
         unit = f"pint[{unit}]"
+    # Fix up data coming back from JSON
     return df[col].replace("<NA>", "nan", regex=True).map(Q_).astype(unit)
 
 
@@ -1688,7 +1693,7 @@ def update_graph(
     scope,
     budget_meth,
 ):
-    # changed_id = [p["prop_id"] for p in dash.callback_context.triggered][0]  # to catch which widgets were pressed
+    # changed_ids = [p["prop_id"] for p in dash.callback_context.triggered]  # to catch which widgets were pressed
     amended_portfolio = pd.read_json(io.StringIO(initial_value=portfolio_json), orient="split")
     # Why does this get lost in translation?
     amended_portfolio.index.name = "company_id"
@@ -1762,6 +1767,14 @@ def update_graph(
 
     logger.info(f"ready to plot!\n{filt_df}")
 
+    if ITR.HAS_UNCERTAINTIES and isinstance(filt_df.cumulative_target.iloc[0].m, ITR.UFloat) != isinstance(
+        filt_df.cumulative_trajectory.iloc[0].m, ITR.UFloat
+    ):
+        # Promote to UFloats if needed
+        if isinstance(filt_df.cumulative_target.iloc[0].m, ITR.UFloat):
+            filt_df = filt_df.assign(cumulative_trajectory=lambda x: x.cumulative_trajectory + ITR.ufloat(0, 0))
+        else:
+            filt_df = filt_df.assign(cumulative_target=lambda x: x.cumulative_target + ITR.ufloat(0, 0))
     # Scatter plot; we add one ton CO2e to everything because log/log plotting of zero is problematic
     filt_df.loc[:, "cumulative_usage"] = (
         filt_df.cumulative_target.fillna(filt_df.cumulative_trajectory)
@@ -1909,13 +1922,13 @@ def update_graph(
         aggregated_scores = temperature_score.aggregate_scores(filt_df)
         agg_zero = Q_(0.0, "delta_degC")
         agg_score = agg_zero
-        if not aggregated_scores.long.S1S2.empty():
+        if not aggregated_scores.long.S1S2.empty:
             agg_score = aggregated_scores.long.S1S2.all.score
-        elif not aggregated_scores.long.S1.empty():
+        elif not aggregated_scores.long.S1.empty:
             agg_score = aggregated_scores.long.S1.all.score
-        if not aggregated_scores.long.S1S2S3.empty():
+        if not aggregated_scores.long.S1S2S3.empty:
             agg_score = agg_score + aggregated_scores.long.S1S2S3.all.score
-        elif not aggregated_scores.long.S3.empty():
+        elif not aggregated_scores.long.S3.empty:
             agg_score = agg_score + aggregated_scores.long.S3.all.score
         elif agg_score == agg_zero:
             return [agg_method.value, Q_(np.nan, "delta_degC")]
@@ -2068,15 +2081,15 @@ def update_graph(
     )
 
     # FIXME: this is utter confusion with respect to scopes!
-    if not aggregated_scores.long.S1S2.empty():
+    if not aggregated_scores.long.S1S2.empty:
         scores = aggregated_scores.long.S1S2.all.score.m
-    elif not aggregated_scores.long.S1.empty():
+    elif not aggregated_scores.long.S1.empty:
         scores = aggregated_scores.long.S1.all.score.m
-    elif not aggregated_scores.long.S1S2S3.empty():
+    elif not aggregated_scores.long.S1S2S3.empty:
         scores = aggregated_scores.long.S1S2S3.all.score.m
-    elif not aggregated_scores.long.S3.empty():
+    elif not aggregated_scores.long.S3.empty:
         scores = aggregated_scores.long.S3.all.score.m
-    elif not aggregated_scores.long.S2.empty():
+    elif not aggregated_scores.long.S2.empty:
         scores = aggregated_scores.long.S2.all.score.m
     else:
         raise ValueError("No aggregated scores")
