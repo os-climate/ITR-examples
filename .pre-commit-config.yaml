@@ -4,8 +4,6 @@ ci:
   skip:
     # pre-commit.ci cannot install WGET, so tomlint must be disabled
     - tomllint
-    # pre-commit.ci throws some error related to Docker!
-    - shellcheck
 
 exclude: |
   (?x)^(
@@ -53,9 +51,12 @@ repos:
 
   # Autoformat: YAML, JSON, Markdown, etc.
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.3
+    rev: v4.0.0-alpha.3
     hooks:
       - id: prettier
+        # Possible workaround for 4.0.0a3 errors
+        # See: https://github.com/prettier/prettier/issues/15742
+        # entry: prettier --write --ignore-unknown
         args:
           ["--ignore-unknown", "--no-error-on-unmatched-pattern", "!chart/**"]
 
@@ -73,12 +74,12 @@ repos:
   #       args: ['--py37-plus']
 
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 23.10.1
+    rev: 23.11.0
     hooks:
       - id: black
 
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: 23.10.1
+    rev: 23.11.0
     hooks:
       - id: black-jupyter
 
@@ -93,8 +94,8 @@ repos:
       - id: bashate
         args: ["--ignore=E006"]
 
-  - repo: https://github.com/koalaman/shellcheck-precommit
-    rev: v0.9.0
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
     hooks:
       - id: shellcheck
       # Optionally only show errors and warnings
@@ -117,7 +118,7 @@ repos:
       - id: isort
 
   - repo: https://github.com/adrienverge/yamllint.git
-    rev: v1.32.0
+    rev: v1.33.0
     hooks:
       - id: yamllint
         args: [--strict]
@@ -148,6 +149,9 @@ repos:
   #   - id: codespell
 
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: "v1.6.1"
+    rev: "v1.7.1"
     hooks:
       - id: mypy
+        verbose: true
+        args: [--show-error-codes]
+        additional_dependencies: ["types-requests"]

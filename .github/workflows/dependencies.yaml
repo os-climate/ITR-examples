@@ -1,15 +1,15 @@
 ---
-name: "⛔️ Update dependencies"
+name: '⛔️ Update dependencies'
 
 # yamllint disable-line rule:truthy
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * MON"
+    - cron: '0 0 * * MON'
 
 jobs:
   update-dependencies:
-    name: "Update Python modules"
+    name: 'Update Python modules'
     runs-on: ubuntu-latest
     permissions:
       # IMPORTANT: mandatory to raise the PR
@@ -24,15 +24,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: "Setup PDM for build commands"
-        uses: pdm-project/setup-pdm@v3
-
       - name: Update dependencies
-        uses: pdm-project/update-deps-action@main
+        uses: ModeSevenIndustrialSolutions/update-deps-action@v1
         with:
+          sign-off-commit: 'true'
           token: ${{ secrets.GH_TOKEN }}
-          commit-message: "Chore: Update dependencies and pdm.lock"
-          pr-title: "Update Python module dependencies"
+          commit-message: 'Chore: Update dependencies and pdm.lock'
+          pr-title: 'Update Python module dependencies'
           update-strategy: eager
           # Whether to install PDM plugins before update
-          install-plugins: "false"
+          install-plugins: 'false'
