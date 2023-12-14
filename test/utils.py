@@ -5,18 +5,18 @@ import unittest
 import ITR
 import pandas as pd
 from ITR.data.osc_units import EI_Metric, EI_Quantity
-from ITR.interfaces import (
+from ITR.interfaces import (  # ICompanyEIProjections,
     EScope,
     ICompanyData,
     ICompanyEIProjection,
-    ICompanyEIProjections,
     ICompanyEIProjectionsScopes,
 )
 
 # isort: split
 
 from pint import Quantity
-from pint_pandas import PintType
+
+# from pint_pandas import PintType
 
 
 class ITR_Encoder(json.JSONEncoder):
