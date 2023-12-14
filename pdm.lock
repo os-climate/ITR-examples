@@ -2295,7 +2295,7 @@ files = [
 
 [[package]]
 name = "pdm"
-version = "2.11.0"
+version = "2.11.1"
 requires_python = ">=3.8"
 summary = "A modern Python package and dependency manager supporting the latest PEP standards"
 dependencies = [
@@ -2321,24 +2321,24 @@ dependencies = [
     "virtualenv>=20",
 ]
 files = [
-    {file = "pdm-2.11.0-py3-none-any.whl", hash = "sha256:925569ab173d08a6cc171e0d3dd50e04016a0ef622e0799fa1bdbc283782213a"},
-    {file = "pdm-2.11.0.tar.gz", hash = "sha256:3ff4b5d4d8af4747dde978e8d0fea8c5f5e65a07dee861d2c2fbafdcc8d69205"},
+    {file = "pdm-2.11.1-py3-none-any.whl", hash = "sha256:6e18eab6f92ca7a31c68ea078d09d0a64b5f2aebf4f0e60ae81b1c5ca84a4189"},
+    {file = "pdm-2.11.1.tar.gz", hash = "sha256:b10bc4e5394856f1639ddc9bc754d9c26323ec5b828a135c6ed35f935b054b83"},
 ]
 
 [[package]]
 name = "pdm"
-version = "2.11.0"
+version = "2.11.1"
 extras = ["pytest"]
 requires_python = ">=3.8"
 summary = "A modern Python package and dependency manager supporting the latest PEP standards"
 dependencies = [
-    "pdm==2.11.0",
+    "pdm==2.11.1",
     "pytest",
     "pytest-mock",
 ]
 files = [
-    {file = "pdm-2.11.0-py3-none-any.whl", hash = "sha256:925569ab173d08a6cc171e0d3dd50e04016a0ef622e0799fa1bdbc283782213a"},
-    {file = "pdm-2.11.0.tar.gz", hash = "sha256:3ff4b5d4d8af4747dde978e8d0fea8c5f5e65a07dee861d2c2fbafdcc8d69205"},
+    {file = "pdm-2.11.1-py3-none-any.whl", hash = "sha256:6e18eab6f92ca7a31c68ea078d09d0a64b5f2aebf4f0e60ae81b1c5ca84a4189"},
+    {file = "pdm-2.11.1.tar.gz", hash = "sha256:b10bc4e5394856f1639ddc9bc754d9c26323ec5b828a135c6ed35f935b054b83"},
 ]
 
 [[package]]
