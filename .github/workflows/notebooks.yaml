@@ -41,3 +41,11 @@ jobs:
 
       - name: "Build notebooks: pytest"
         run: pytest --nbmake notebooks/quick_temp_score_calculation.ipynb
+
+      - name: Upload logs as artefacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-logs
+          path: /tmp/*.log
+          retention-days: 14
