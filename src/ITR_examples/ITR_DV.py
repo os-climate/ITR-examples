@@ -3,14 +3,15 @@
 
 import argparse
 
-# import io
 # import warnings
 import ast
+import io
 import json
 import logging
 import os
 import pickle
 import sys
+from pathlib import Path
 from uuid import uuid4
 
 import dash
@@ -25,7 +26,8 @@ import plotly.graph_objects as go
 from dash import DiskcacheManager, dcc, html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-from ITR.configs import ITR_mean, ITR_median
+from ITR import data_dir
+from ITR.configs import ColumnsConfig, ITR_mean, ITR_median, TemperatureScoreConfig
 from ITR.data.base_providers import (
     BaseProviderIntensityBenchmark,
     BaseProviderProductionBenchmark,
@@ -36,6 +38,8 @@ from ITR.data.template import TemplateProviderCompany
 from ITR.data.vault_providers import (
     DataVaultWarehouse,
     VaultCompanyDataProvider,
+    VaultInstance,
+    VaultProviderIntensityBenchmark,
     VaultProviderProductionBenchmark,
     requantify_df,
 )
@@ -51,11 +55,6 @@ from ITR.portfolio_aggregation import PortfolioAggregationMethod
 from ITR.temperature_score import TemperatureScore
 from pint import Quantity
 from pint_pandas import PintType
-
-from . import data_dir
-
-# import base64
-
 
 # from ITR.configs import LoggingConfig
 
@@ -75,12 +74,15 @@ logger.info("Start!")
 cache = diskcache.Cache("./.webassets-cache")
 background_callback_manager = DiskcacheManager(cache, cache_by=[lambda: launch_uid], expire=600)
 
-# Some variables to control whether we use background caching or not.  Cannot use with vault nor breakpoints.
+# Some variables to control whether we use background caching or not.
+# We cannot use background caching with vault nor breakpoints.
 have_breakpoint = False
 use_data_vault = True
 
-examples_dir = ""  # 'examples'
-root = os.path.abspath("")
+# Default Dash port is 8050, but can use 8051 if we want to run two side-by-side
+port_number = 8051
+
+root = Path(__file__).parent
 
 # Set input filename (from commandline or default)
 parser = argparse.ArgumentParser()
@@ -89,7 +91,7 @@ if len(sys.argv) > 1:
     args = parser.parse_args()
     company_data_path = args.file
 else:
-    company_data_path = os.path.join(data_dir, "20220927 ITR V2 Sample Data.xlsx")
+    company_data_path = os.path.join(root, "data", "20220927 ITR V2 Sample Data.xlsx")
 
 # Load environment variables from credentials.env
 osc.load_credentials_dotenv()
@@ -106,34 +108,41 @@ essd_schema = "essd"
 essd_prefix = ""
 demo_schema = "demo_dv"
 
-itr_prefix = "template_"
+itr_prefix = "itr_"
 
 engine = osc.attach_trino_engine(verbose=True, catalog=ingest_catalog, schema=demo_schema)
+vault = VaultInstance(
+    engine=engine,
+    schema=demo_schema,
+)
 
 if use_data_vault:
+    vault_prod_bm = VaultProviderProductionBenchmark(
+        vault,
+        benchmark_name=f"{itr_prefix}benchmark_prod",
+    )
+
+    vault_EI_bm = VaultProviderIntensityBenchmark(
+        vault,
+        benchmark_name=f"{itr_prefix}benchmark_ei",
+    )
     vault_company_data = VaultCompanyDataProvider(
-        engine,
+        vault,
         company_table=f"{itr_prefix}company_data",
-        target_table=None,
-        trajectory_table=None,
-        company_schema=demo_schema,
-        column_config=None,
+        template_company_data=None,
     )
 
     vault_warehouse = DataVaultWarehouse(
-        engine,
-        company_data=None,
-        benchmark_projected_production=None,
-        benchmarks_projected_ei=None,
-        ingest_schema=demo_schema,
+        vault,
+        company_data=vault_company_data,
+        benchmark_projected_production=vault_prod_bm,
+        benchmarks_projected_ei=vault_EI_bm,
         itr_prefix=itr_prefix,
-        column_config=None,
     )
 
 # Production benchmark (there's only one, and we have to stretch it from OECM to cover TPI)
-data_json_units_dir = "json-units"
 benchmark_prod_json_file = "benchmark_production_OECM.json"
-benchmark_prod_json = os.path.join(data_dir, data_json_units_dir, benchmark_prod_json_file)
+benchmark_prod_json = os.path.join(data_dir, benchmark_prod_json_file)
 with open(benchmark_prod_json) as json_file:
     parsed_json = json.load(json_file)
 
@@ -1026,7 +1035,9 @@ app.layout = dbc.Container(  # always start with container
     prevent_initial_call=False,
 )
 def warehouse_new(banner_title):
-    # load company data
+    """
+    Load initial corporate data file
+    """
     if use_data_vault:
         Warehouse = vault_warehouse
         return ("warehouse", True, "Spin-warehouse")
@@ -1076,15 +1087,15 @@ def recalculate_individual_itr(warehouse_pickle_json, eibm, proj_meth, winz, bm_
         # In this case the database does all our work for us...once we support multiple benchmarks
         return ("warehouse-eibm", "no", bm_region, "Spin-eibm")
 
-    changed_id = [p["prop_id"] for p in dash.callback_context.triggered][0]  # to catch which widgets were pressed
+    changed_ids = [p["prop_id"] for p in dash.callback_context.triggered]  # to catch which widgets were pressed
     Warehouse = pickle.loads(ast.literal_eval(json.loads(warehouse_pickle_json)))
 
-    if "scenarios-cutting" in changed_id or "projection-method" in changed_id:  # if winzorization params were changed
+    if "scenarios-cutting" in changed_ids or "projection-method" in changed_ids:  # if winzorization params were changed
         Warehouse.company_data.projection_controls.TREND_CALC_METHOD = ITR_median if proj_meth == "median" else ITR_mean
         Warehouse.company_data.projection_controls.LOWER_PERCENTILE = winz[0] / 100
         Warehouse.company_data.projection_controls.UPPER_PERCENTILE = winz[1] / 100
 
-    if "eibm-dropdown" in changed_id or Warehouse.benchmarks_projected_ei is None:
+    if "eibm-dropdown" in changed_ids or Warehouse.benchmarks_projected_ei is None:
         show_oecm_bm = "no"
         if eibm == "OECM_PC":
             benchmark_file = benchmark_EI_OECM_PC_file
@@ -1102,13 +1113,12 @@ def recalculate_individual_itr(warehouse_pickle_json, eibm, proj_meth, winz, bm_
         else:
             benchmark_file = benchmark_EI_TPI_below_2_file
         # load intensity benchmarks
-        benchmark_EI = os.path.join(data_dir, data_json_units_dir, benchmark_file)
+        benchmark_EI = os.path.join(data_dir, benchmark_file)
         with open(benchmark_EI) as json_file:
             parsed_json = json.load(json_file)
         if eibm.startswith("TPI_2_degrees"):
             extra_EI = os.path.join(
                 data_dir,
-                data_json_units_dir,
                 benchmark_EI_TPI_2deg_high_efficiency_file
                 if "_high_efficiency" in eibm
                 else benchmark_EI_TPI_2deg_shift_improve_file,
@@ -1126,7 +1136,7 @@ def recalculate_individual_itr(warehouse_pickle_json, eibm, proj_meth, winz, bm_
         Warehouse.update_benchmarks(base_production_bm, EI_bm)
         bm_region = eibm
 
-    elif "scenarios-cutting" in changed_id or "projection-method" in changed_id:
+    elif "scenarios-cutting" in changed_ids or "projection-method" in changed_ids:
         # Trajectories are company-specific, but ultimately do depend on benchmarks (for units/scopes)
         Warehouse.update_trajectories()
 
@@ -1170,12 +1180,12 @@ def recalculate_warehouse_target_year(warehouse_pickle_json, target_year, sector
     """
 
     if use_data_vault:
-        df_fundamentals = pd.read_sql_table(f"{itr_prefix}company_data", engine, index_col="company_id")
+        df_fundamentals = pd.read_sql_table(vault_company_data._company_table, engine, index_col="company_id")
         df_ei = requantify_df(
-            pd.read_sql_table(f"{itr_prefix}benchmark_ei", engine, index_col=["sector", "region"]).sort_index()
+            pd.read_sql_table(vault_EI_bm._benchmark_name, engine, index_col=["sector", "region"]).sort_index()
         ).convert_dtypes()
         df_ei.scope = df_ei.scope.map(lambda x: EScope[x])
-        df_ei = df_ei.set_index("scope", append=True).sort_index()
+        df_ei_t = df_ei.set_index("scope", append=True).sort_index().T
     else:
         Warehouse = pickle.loads(ast.literal_eval(json.loads(warehouse_pickle_json)))
         EI_bm = Warehouse.benchmarks_projected_ei
@@ -1183,7 +1193,7 @@ def recalculate_warehouse_target_year(warehouse_pickle_json, target_year, sector
         # Instead, we have to re-make the change for the benefit of downstream users...
         EI_bm.projection_controls.TARGET_YEAR = target_year
         Warehouse.company_data.projection_controls.TARGET_YEAR = target_year
-        df_ei = EI_bm._EI_df
+        df_ei_t = EI_bm._EI_df_t
         df_fundamentals = Warehouse.company_data.df_fundamentals
 
     df_fundamentals = df_fundamentals[df_fundamentals.index.isin(df_portfolio.company_id)]
@@ -1222,7 +1232,7 @@ def recalculate_warehouse_target_year(warehouse_pickle_json, target_year, sector
         scope = ""
 
     return (
-        "warehouse-ty" if use_data_vault else json.dumps(pickle.dumps(Warehouse), default=str),
+        "warehouse-ty" if use_data_vault else json.dumps(pickle.dumps(Warehouse), default=ITR.JSONEncoder),
         json.dumps([{"label": i, "value": i} for i in sorted(pf_bm_sectors)] + [{"label": "All Sectors", "value": ""}]),
         sector,
         json.dumps([{"label": i, "value": i} for i in sorted(pf_bm_regions)] + [{"label": "All Regions", "value": ""}]),
@@ -1281,6 +1291,7 @@ def recalculate_warehouse_target_year(warehouse_pickle_json, target_year, sector
     ),  # fake for spinner
     inputs=(
         Input("warehouse-ty", "data"),
+        Input("target-year", "value"),
         Input("sector-dropdown-ty", "value"),
         Input("sector-value-ty", "value"),
         Input("region-dropdown-ty", "value"),
@@ -1299,6 +1310,7 @@ def recalculate_warehouse_target_year(warehouse_pickle_json, target_year, sector
 )
 def recalculate_target_year_ts(
     warehouse_pickle_json,
+    target_year,
     sectors_ty,
     sector_ty,
     regions_ty,
@@ -1319,11 +1331,10 @@ def recalculate_target_year_ts(
     """
 
     if use_data_vault:
-        df_fundamentals = pd.read_sql_table(f"{itr_prefix}company_data", engine).set_index("company_id")
-        # df_prod = requantify_df(pd.read_sql_table(f"{itr_prefix}benchmark_prod", engine)).convert_dtypes()
+        df_fundamentals = pd.read_sql_table(vault_company_data._company_table, engine).set_index("company_id")
         df_ei = requantify_df(
             pd.read_sql_table(
-                f"{itr_prefix}benchmark_ei",
+                vault_EI_bm._benchmark_name,
                 engine,
                 index_col=["year", "sector", "region"],
             )
@@ -1506,7 +1517,7 @@ def recalculate_target_year_ts(
             sector_ts = "+"
         regions_dl = [{"label": r, "value": r} for r in sorted(regions)] + [{"label": "All Regions", "value": ""}]
         if region_ts == "+" or (region == "" and pf_bm_regions - regions):
-            regions_dl.insert(-1, {"label": f"All Regions (in sectors)", "value": "+"})
+            regions_dl.insert(-1, {"label": "All Regions (in sectors)", "value": "+"})
             region = ""
             region_ts = "+"
         scopes_dl = [{"label": s.name, "value": s.name} for s in sorted(scopes)] + [
@@ -1603,26 +1614,19 @@ def recalculate_target_year_ts(
             target_year_cum_co2 = get_co2_in_sectors_region_scope(prod_bm, df_ei_t, sectors, bm_region, scope_list)
 
         if use_data_vault:
-            assert ITR.configs.ProjectionControls.TARGET_YEAR in target_year_cum_co2.index
+            assert target_year in target_year_cum_co2.index
         else:
+            assert EI_bm.projection_controls.TARGET_YEAR == target_year
             assert EI_bm.projection_controls.TARGET_YEAR in target_year_cum_co2.index
 
-    if use_data_vault:
-        total_target_co2 = target_year_cum_co2.loc[ITR.configs.ProjectionControls.TARGET_YEAR]
-        total_final_co2 = target_year_cum_co2.loc[df_ei.columns[-1]]
-        if target_year_1e_cum_co2 is not None:
-            target_year_1e = target_year_1e_cum_co2.loc[ITR.configs.ProjectionControls.TARGET_YEAR]
-        if target_year_2e_cum_co2 is not None:
-            target_year_2e = target_year_2e_cum_co2.loc[ITR.configs.ProjectionControls.TARGET_YEAR]
-    else:
-        total_target_co2 = target_year_cum_co2.loc[EI_bm.projection_controls.TARGET_YEAR]
-        total_final_co2 = target_year_cum_co2.loc[df_ei.columns[-1]]
-        if target_year_1e_cum_co2 is not None:
-            target_year_1e = target_year_1e_cum_co2.loc[EI_bm.projection_controls.TARGET_YEAR]
-        if target_year_2e_cum_co2 is not None:
-            target_year_2e = target_year_2e_cum_co2.loc[EI_bm.projection_controls.TARGET_YEAR]
+    total_target_co2 = target_year_cum_co2.loc[target_year]
+    total_final_co2 = target_year_cum_co2.loc[df_ei_t.index[-1]]
+    if target_year_1e_cum_co2 is not None:
+        target_year_1e = target_year_1e_cum_co2.loc[target_year]
+    if target_year_2e_cum_co2 is not None:
+        target_year_2e = target_year_2e_cum_co2.loc[target_year]
 
-    ts_cc = ITR.configs.TemperatureScoreConfig.CONTROLS_CONFIG
+    ts_cc = TemperatureScoreConfig.CONTROLS_CONFIG
     # FIXME: Note that we cannot use ts_cc.scenario_target_temperature because that doesn't track the benchmark value
     # And we cannot make it track the benchmark value because then it becomes another global variable that would break Dash.
     if use_data_vault:
@@ -1697,12 +1701,13 @@ def bm_budget_year_target(show_oecm, target_year, bm_end_use_budget, bm_1e_budge
     ),  # fake for spinner
     inputs=(
         Input("warehouse-ty", "data"),
+        Input("target-year", "value"),
         Input("budget-method", "value"),
         Input("target_probability", "value"),  # winzorization slider
     ),
     prevent_initial_call=True,
 )
-def calc_temperature_score(warehouse_pickle_json, budget_meth, target_probability, *_):
+def calc_temperature_score(warehouse_pickle_json, target_year: int, budget_meth: str, target_probability: float, *_):
     """
     Calculate temperature scores according to the carbon budget methodology
     :param warehouse_pickle_json: Pickled JSON version of Warehouse containing only company data
@@ -1710,34 +1715,33 @@ def calc_temperature_score(warehouse_pickle_json, budget_meth, target_probabilit
     """
     global companies
 
+    changed_ids = [p["prop_id"] for p in dash.callback_context.triggered]  # to catch which widgets were pressed
+
     if use_data_vault:
         # FIXME: need target year!
+        df_fundamentals = vault_warehouse.company_data.get_company_fundamentals(df_portfolio.company_id.tolist())
         sql_query = f"""
-select cd.company_id, cd.sector, cd.region, ts.scope, cd.company_name,
+select ts.company_id, ts.scope,
        'LONG' as time_frame, 'COMPLETE' as score_result_type,
-       production_by_year as base_year_production,
-       production_by_year_units as base_year_production,
-       co2_s1_by_year + coalesce(co2_s2_by_year, 0) as ghg_s1s2,
-       co2_s1_by_year_units as ghg_s1s2_units,
-       co2_s3_by_year as ghg_s3,
-       co2_s3_by_year_units as ghg_s3_units,
-       company_revenue, company_market_cap, company_ev as company_enterprise_value, company_evic as company_ev_plus_cash,
-       company_total_assets, company_cash_equivalents, company_debt,
        cumulative_budget, cumulative_budget_units,
+       cumulative_scaled_budget, cumulative_scaled_budget_units,
        cumulative_trajectory, cumulative_trajectory_units,
        cumulative_target, cumulative_target_units,
-       trajectory_temperature_score as trajectory_score,
-       target_temperature_score as target_score
-from {itr_prefix}temperature_scores ts
-       join {itr_prefix}production_data pd on ts.company_id=pd.company_id
-       join {itr_prefix}emissions_data co2 on ts.company_id=co2.company_id
-       join {itr_prefix}company_data cd on ts.company_id=cd.company_id
-       join {itr_prefix}cumulative_budget_1 cb on ts.company_id=cb.company_id and ts.scope=cb.scope
-       join {itr_prefix}cumulative_emissions ce on ts.company_id=ce.company_id and ts.scope=ce.scope
-where pd.year=2019 and co2.year=2019"""
+       trajectory_temperature_score as trajectory_score, trajectory_temperature_score_units as trajectory_score_units,
+       trajectory_overshoot_ratio,  -- dimensionless
+       target_temperature_score as target_score, target_temperature_score_units as target_score_units,
+       target_overshoot_ratio,  -- dimensionless
+       cb.benchmark_temp as benchmark_temperature, cb.benchmark_temp_units as benchmark_temperature_units,
+       cb.global_budget as benchmark_global_budget, cb.global_budget_units as benchmark_global_budget_units
+from {vault_warehouse._tempscore_table} ts
+       join {vault_warehouse._emissions_table} ce on ts.company_id=ce.company_id and ts.scope=ce.scope and ts.year=ce.year
+       join {vault_warehouse._budgets_table} cb on ts.company_id=cb.company_id and ts.scope=cb.scope and ts.year=cb.year
+       join {vault_warehouse._overshoot_table} o_r on ts.company_id=o_r.company_id and ts.scope=o_r.scope and ts.year=o_r.year
+where ts.year={target_year}
+"""
         sql_temp_score_df = pd.read_sql_query(sql_query, engine, index_col="company_id")
         temp_score_df = requantify_df(
-            sql_temp_score_df,
+            df_fundamentals.merge(sql_temp_score_df, on="company_id"),
             typemap={
                 "ghg_s1s2": "Mt CO2e",
                 "ghg_s3": "Mt CO2e",
@@ -1746,31 +1750,25 @@ where pd.year=2019 and co2.year=2019"""
                 "cumulative_budget": "Mt CO2e",
                 "trajectory_score": "delta_degC",
                 "target_score": "delta_degC",
+                "benchmark_temperature": "delta_degC",
+                "benchmark_global_budget": "Gt CO2e",
             },
         )
-        df = temp_score_df[
-            ~temp_score_df.index.isin(
-                [
-                    "US6362744095+Gas Utilities",
-                    "US0236081024+Gas Utilities",
-                    "CA87807B1076+Gas",
-                    "CA87807B1076+Oil",
-                    "NO0010657505",
-                ]
-            )
-        ]
-        df = df.assign(
+        df = temp_score_df.assign(
             scope=lambda x: x.scope.map(lambda y: EScope[y]),
             time_frame=ETimeFrames["LONG"],
+            # FIXME: we should set this correctly!
             score_result_type=EScoreResultType["COMPLETE"],
         )
         df["temperature_score"] = (
             df.trajectory_score.fillna(df.target_score) + df.target_score.fillna(df.trajectory_score)
         ) / 2.0
-        assert "target_probability" not in changed_id
+        assert "target_probability" not in changed_ids
 
-        amended_portfolio = df.merge(df_portfolio[["company_id", "investment_value"]], on="company_id").set_index(
-            "company_id"
+        amended_portfolio = (
+            df.merge(df_portfolio[["company_id", "investment_value"]], on="company_id")
+            .set_index("company_id")
+            .sort_values(by="company_name")
         )
     else:
         Warehouse = pickle.loads(ast.literal_eval(json.loads(warehouse_pickle_json)))
@@ -1779,13 +1777,16 @@ where pd.year=2019 and co2.year=2019"""
             scopes=None,  # None means "use the appropriate scopes for the benchmark
             # Options for the aggregation method are WATS, TETS, AOTS, MOTS, EOTS, ECOTS, and ROTS
             aggregation_method=PortfolioAggregationMethod.WATS,
+            budget_column=ColumnsConfig.CUMULATIVE_SCALED_BUDGET
+            if budget_meth == "contraction"
+            else ColumnsConfig.CUMULATIVE_BUDGET,
         )
 
-        if "target_probability" in changed_id:
+        if "target_probability" in changed_ids:
             df = temperature_score.calculate(
                 data_warehouse=Warehouse,
                 portfolio=companies,
-                target_probability=target_probability / 100,
+                target_probability=target_probability / 100.0,
             )
         else:
             df = temperature_score.calculate(data_warehouse=Warehouse, portfolio=companies)
@@ -1803,6 +1804,7 @@ def quantify_col(df: pd.DataFrame, col: str, unit=None):
         return asPintSeries(df[col].map(Q_))
     if not unit.startswith("pint["):
         unit = f"pint[{unit}]"
+    # Fix up data coming back from JSON
     return df[col].replace("<NA>", "nan", regex=True).map(Q_).astype(unit)
 
 
@@ -1841,7 +1843,7 @@ def update_graph(
     scope,
     budget_meth,
 ):
-    # changed_id = [p["prop_id"] for p in dash.callback_context.triggered][0]  # to catch which widgets were pressed
+    # changed_ids = [p["prop_id"] for p in dash.callback_context.triggered]  # to catch which widgets were pressed
     amended_portfolio = pd.read_json(io.StringIO(initial_value=portfolio_json), orient="split")
     # Why does this get lost in translation?
     amended_portfolio.index.name = "company_id"
@@ -2070,13 +2072,13 @@ def update_graph(
         aggregated_scores = temperature_score.aggregate_scores(filt_df)
         agg_zero = Q_(0.0, "delta_degC")
         agg_score = agg_zero
-        if aggregated_scores.long.S1S2:
+        if not aggregated_scores.long.S1S2.empty:
             agg_score = aggregated_scores.long.S1S2.all.score
-        elif aggregated_scores.long.S1:
+        elif not aggregated_scores.long.S1.empty:
             agg_score = aggregated_scores.long.S1.all.score
-        if aggregated_scores.long.S1S2S3:
+        if not aggregated_scores.long.S1S2S3.empty:
             agg_score = agg_score + aggregated_scores.long.S1S2S3.all.score
-        elif aggregated_scores.long.S3:
+        elif not aggregated_scores.long.S3.empty:
             agg_score = agg_score + aggregated_scores.long.S3.all.score
         elif agg_score == agg_zero:
             return [agg_method.value, Q_(np.nan, "delta_degC")]
@@ -2229,15 +2231,15 @@ def update_graph(
     )
 
     # FIXME: this is utter confusion with respect to scopes!
-    if aggregated_scores.long.S1S2:
+    if not aggregated_scores.long.S1S2.empty:
         scores = aggregated_scores.long.S1S2.all.score.m
-    elif aggregated_scores.long.S1:
+    elif not aggregated_scores.long.S1.empty:
         scores = aggregated_scores.long.S1.all.score.m
-    elif aggregated_scores.long.S1S2S3:
+    elif not aggregated_scores.long.S1S2S3.empty:
         scores = aggregated_scores.long.S1S2S3.all.score.m
-    elif aggregated_scores.long.S3:
+    elif not aggregated_scores.long.S3.empty:
         scores = aggregated_scores.long.S3.all.score.m
-    elif aggregated_scores.long.S2:
+    elif not aggregated_scores.long.S2.empty:
         scores = aggregated_scores.long.S2.all.score.m
     else:
         raise ValueError("No aggregated scores")
