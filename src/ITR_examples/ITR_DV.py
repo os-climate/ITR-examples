@@ -5,6 +5,7 @@ import argparse
 
 # import warnings
 import ast
+import concurrent.futures
 import io
 import json
 import logging
@@ -1083,6 +1084,7 @@ def recalculate_individual_itr(warehouse_pickle_json, eibm, proj_meth, winz, bm_
     :param proj_meth: Trajectory projection method (median or mean)
     :param winz: Winsorization parameters (limit of outlier data)
     """
+
     if use_data_vault:
         # In this case the database does all our work for us...once we support multiple benchmarks
         return ("warehouse-eibm", "no", bm_region, "Spin-eibm")
@@ -1180,10 +1182,38 @@ def recalculate_warehouse_target_year(warehouse_pickle_json, target_year, sector
     """
 
     if use_data_vault:
-        df_fundamentals = pd.read_sql_table(vault_company_data._company_table, engine, index_col="company_id")
+        df_dict = {}
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future_to_df_var = {
+                executor.submit(
+                    pd.read_sql,
+                    sql=f"select company_id, sector, region from {vault_company_data._company_table}",
+                    con=engine,
+                    index_col="company_id",
+                ): "df_fundamentals",
+                executor.submit(
+                    pd.read_sql,
+                    sql=f"""
+select sector, region, scope, intensity, intensity_units, year
+from {vault_EI_bm._benchmark_name}
+where sector in (select distinct sector from {vault_company_data._company_table})""",
+                    con=engine,
+                    index_col=["sector", "region"],
+                ): "df_ei",
+            }
+            for future in concurrent.futures.as_completed(future_to_df_var):
+                df_var = future_to_df_var[future]
+                try:
+                    df_dict[df_var] = future.result()
+                except Exception as exc:
+                    print("%r generated an exception: %s" % (df_var, exc))
+
+        df_fundamentals = df_dict["df_fundamentals"]
         df_ei = requantify_df(
-            pd.read_sql_table(vault_EI_bm._benchmark_name, engine, index_col=["sector", "region"]).sort_index()
-        ).convert_dtypes()
+            # pd.read_sql_table(vault_EI_bm._benchmark_name, engine, index_col=["sector", "region"]).sort_index()
+            # global_budget, global_budget_units, benchmark_temp, benchmark_temp_units, is_afolu_included, production_centric,
+            df_dict["df_ei"].convert_dtypes()
+        )
         df_ei.scope = df_ei.scope.map(lambda x: EScope[x])
         df_ei_t = df_ei.set_index("scope", append=True).sort_index().T
     else:
@@ -1331,14 +1361,38 @@ def recalculate_target_year_ts(
     """
 
     if use_data_vault:
-        df_fundamentals = pd.read_sql_table(vault_company_data._company_table, engine).set_index("company_id")
+        df_dict = {}
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            future_to_df_var = {
+                executor.submit(
+                    pd.read_sql,
+                    sql=f"select company_id, sector, region from {vault_company_data._company_table}",
+                    con=engine,
+                    index_col="company_id",
+                ): "df_fundamentals",
+                executor.submit(
+                    pd.read_sql,
+                    sql=f"""
+select year, sector, region, scope, intensity, intensity_units
+from {vault_EI_bm._benchmark_name}
+where sector in (select distinct sector from {vault_company_data._company_table})""",
+                    con=engine,
+                    index_col=["year", "sector", "region"],
+                ): "df_ei",
+            }
+            for future in concurrent.futures.as_completed(future_to_df_var):
+                df_var = future_to_df_var[future]
+                try:
+                    df_dict[df_var] = future.result()
+                except Exception as exc:
+                    print("%r generated an exception: %s" % (df_var, exc))
+
+        df_fundamentals = df_dict["df_fundamentals"]
         df_ei = requantify_df(
-            pd.read_sql_table(
-                vault_EI_bm._benchmark_name,
-                engine,
-                index_col=["year", "sector", "region"],
-            )
-        ).convert_dtypes()
+            # pd.read_sql_table(vault_EI_bm._benchmark_name, engine, index_col=["sector", "region"]).sort_index()
+            # global_budget, global_budget_units, benchmark_temp, benchmark_temp_units, is_afolu_included, production_centric,
+            df_dict["df_ei"].convert_dtypes()
+        )
         df_ei.scope = df_ei.scope.map(lambda x: EScope[x])
         df_ei_t = (
             df_ei.set_index("scope", append=True)[["intensity"]].unstack(level="year").droplevel(level=0, axis=1).T
