@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: "os-climate/devops-toolkit"
-          path: "devops"
+          path: ".devops"
 
       - name: "Update repository workflows and create PR"
         env:
@@ -38,13 +38,23 @@ jobs:
           git config user.email \
            "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "update-devops-tooling"
-          cp devops/dependabot.yml .github/dependabot.yml
-          cp devops/workflows/* .github/workflows/
-          cp devops/scripts/* scripts
-          cp devops/.pre-commit-config.yaml .pre-commit-config.yaml
-          git add .github scripts/* .pre-commit-config.yaml
-          git commit -m "Chore: Pull DevOps tooling from upstream repository"
+          FOLDERS=".github .github/workflows scripts"
+          FILES=".pre-commit-config.yaml .prettierignore .gitignore"
+          for FOLDER in ${FOLDERS}; do
+              # If necessary, create target folder
+              if [ ! -d "$FOLDER" ]; then
+                  mkdir "$FOLDER"
+              fi
+              # Update folder contents
+              cp -a .devops/"$FOLDER"/. "$FOLDER"
+          done
+          # Copy specified files into repository root
+          for FILE in ${FILES}; do
+              cp .devops/"$FILE" "$FILE"
+          done
+          git add .
+          git commit -m "Chore: Update DevOps tooling from central repository"
           git push --set-upstream origin update-devops-tooling
           gh pr create --title \
-           "Chore: Pull DevOps tooling from upstream repository" \
-           --body 'This process automated by a GitHub workflow: bootstrap.yaml'
+            "Chore: Pull DevOps tooling from upstream repository" \
+            --body 'This process automated by a GitHub workflow: bootstrap.yaml'
