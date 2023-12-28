@@ -34,6 +34,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # Remove update-devops-tooling branch if it exists
+          git branch -d update-devops-tooling || true
+          git push origin --delete update-devops-tooling || true
           git config user.name "github-actions[bot]"
           git config user.email \
            "41898282+github-actions[bot]@users.noreply.github.com"
