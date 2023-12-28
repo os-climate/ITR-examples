@@ -30,13 +30,18 @@ jobs:
           repository: "os-climate/devops-toolkit"
           path: ".devops"
 
+      - name: "Purge this working branch, if necessary"
+        id: remove-branch
+        continue-on-error: true
+        # Remove update-devops-tooling branch, if it exists
+        run: |
+          git branch -d update-devops-tooling
+          git push origin --delete update-devops-tooling
+
       - name: "Update repository workflows and create PR"
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Remove update-devops-tooling branch if it exists
-          git branch -d update-devops-tooling || true
-          git push origin --delete update-devops-tooling || true
           git config user.name "github-actions[bot]"
           git config user.email \
            "41898282+github-actions[bot]@users.noreply.github.com"
