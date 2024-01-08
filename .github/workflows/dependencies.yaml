@@ -5,7 +5,7 @@ name: "⛔️ Update dependencies"
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 8 * * FRI"
+    - cron: "0 8 1 * *"
 
 jobs:
   update-dependencies:
@@ -22,7 +22,24 @@ jobs:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: "Checkout repository"
+        uses: actions/checkout@v4
+
+      - name: "Set up Python"
+        uses: actions/setup-python@v5
+
+      - name: "Setup PDM for build commands"
+        uses: pdm-project/setup-pdm@v3
+
+      - name: "Install dependencies"
+        run: |
+          python -m pip install --upgrade pip
+          pdm lock
+          pdm export -o requirements.txt
+          # Add banner reminder to NOT edit requirements.txt file
+          mv requirements.txt /tmp/requirements.txt
+          cp .requirements-banner.txt requirements.txt
+          cat /tmp/requirements.txt >> requirements.txt
 
       - name: Update dependencies
         uses: ModeSevenIndustrialSolutions/update-deps-action@v1

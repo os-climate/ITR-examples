@@ -1,5 +1,5 @@
 ---
-name: "🧪 Unit tests"
+name: "🧪 Unit tests (Matrix)"
 
 # yamllint disable-line rule:truthy
 on:
