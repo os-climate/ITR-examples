@@ -1,0 +1,5 @@
+### DO NOT HAND EDIT THIS FILE ###
+# This file is created by an export of the file contents in: pyproject.toml
+# The pdm utility is used to do this and it is invoked from a GitHub Actions workflow
+# The correct method to update dependencies is to edit the contents of that file
+# You then need to invoke the GitHub Action workflow called: "Update dependencies"
