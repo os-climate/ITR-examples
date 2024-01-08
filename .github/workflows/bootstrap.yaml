@@ -42,6 +42,9 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # Remove update-devops-tooling branch if it exists
+          git branch -d update-devops-tooling || true
+          git push origin --delete update-devops-tooling || true
           git config user.name "github-actions[bot]"
           git config user.email \
            "41898282+github-actions[bot]@users.noreply.github.com"
@@ -60,6 +63,11 @@ jobs:
           for FILE in ${FILES}; do
               cp .devops/"$FILE" "$FILE"
           done
+          # If no changes required, do not throw an error
+          git status
+          if [ $? -eq 0 ]; then
+            echo "No updates/changes to commit"; exit 0
+          fi
           git add .
           git commit -m "Chore: Update DevOps tooling from central repository"
           git push --set-upstream origin update-devops-tooling
