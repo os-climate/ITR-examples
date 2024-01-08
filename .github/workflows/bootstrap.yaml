@@ -30,14 +30,6 @@ jobs:
           repository: "os-climate/devops-toolkit"
           path: ".devops"
 
-      - name: "Purge this working branch, if necessary"
-        id: remove-branch
-        continue-on-error: true
-        # Remove update-devops-tooling branch, if it exists
-        run: |
-          git branch -d update-devops-tooling || :
-          git push origin --delete update-devops-tooling || :
-
       - name: "Update repository workflows and create PR"
         env:
           GH_TOKEN: ${{ github.token }}
@@ -50,7 +42,8 @@ jobs:
            "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -b "update-devops-tooling"
           FOLDERS=".github .github/workflows scripts"
-          FILES=".pre-commit-config.yaml .prettierignore .gitignore"
+          FILES=".pre-commit-config.yaml .prettierignore .gitignore \
+           .requirements-banner.txt"
           for FOLDER in ${FOLDERS}; do
               # If necessary, create target folder
               if [ ! -d "$FOLDER" ]; then
@@ -63,11 +56,6 @@ jobs:
           for FILE in ${FILES}; do
               cp .devops/"$FILE" "$FILE"
           done
-          # If no changes required, do not throw an error
-          git status
-          if [ $? -eq 0 ]; then
-            echo "No updates/changes to commit"; exit 0
-          fi
           git add .
           git commit -m "Chore: Update DevOps tooling from central repository"
           git push --set-upstream origin update-devops-tooling
