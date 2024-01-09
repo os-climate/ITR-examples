@@ -9,7 +9,7 @@ on:
 
 jobs:
   update-dependencies:
-    name: "Update Python modules"
+    name: "Update Python dependencies"
     runs-on: ubuntu-latest
     permissions:
       # IMPORTANT: mandatory to raise the PR
@@ -27,6 +27,8 @@ jobs:
 
       - name: "Set up Python"
         uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
 
       - name: "Update Python dependencies"
         uses: ModeSevenIndustrialSolutions/update-deps-action@v1
@@ -36,6 +38,7 @@ jobs:
           commit-message: "Chore: Update dependencies and pdm.lock [skip ci]"
           pr-title: "Update Python module dependencies"
           update-strategy: eager
+          export-reqs: true
           # Whether to install PDM plugins before update
           install-plugins: "false"
 
