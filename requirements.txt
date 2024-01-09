@@ -117,9 +117,9 @@ boto3-stubs-lite==1.34.15 \
 botocore==1.34.15 \
     --hash=sha256:16bcf871e67ef0177593f06e9e5bae4db51c9a9a2e953cb14feeb42d53441a85 \
     --hash=sha256:c3c3404962a6d9d5e1634bd70ed53b8eff1ff17ee9d7a6240e9e8c94db48ad6f
-botocore-stubs==1.34.14 \
-    --hash=sha256:a9d8db869b3a5ae07434c33c97da3dae6ace73c029481d06de8c1eb815d60b32 \
-    --hash=sha256:d79b7db85fa1c47a90d2f280133a2efb693a4a3669c9ef2719e5ee1abe066cfe
+botocore-stubs==1.34.15 \
+    --hash=sha256:4cd79dd4419e2a229ffa8512154e91c91cad2376675f3ee3b07cbcbb5fd7a256 \
+    --hash=sha256:b42c5aa7bd00a11ff299cac20516db2901254a9b1abad531bddc8400213d91cd
 cachecontrol==0.13.1 \
     --hash=sha256:95dedbec849f46dda3137866dc28b9d133fc9af55f5b805ab1291833e4457aa4 \
     --hash=sha256:f012366b79d2243a6118309ce73151bf52a38d4a5dac8ea57f09bd29087e506b
