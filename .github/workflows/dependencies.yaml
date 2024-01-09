@@ -28,16 +28,8 @@ jobs:
       - name: "Set up Python"
         uses: actions/setup-python@v5
 
-      - name: "Setup PDM for build commands"
-        uses: pdm-project/setup-pdm@v3
-
-      - name: "Update and export dependencies"
-        run: |
-          pdm lock
-          pdm export --without-hashes -o requirements.txt
-
-      - name: "Commit update to repository"
-        uses: pdm-project/update-deps-action@main
+      - name: "Update Python dependencies"
+        uses: pdm-project/update-deps-action@v1
         with:
           sign-off-commit: "true"
           token: ${{ secrets.GH_TOKEN }}
@@ -46,3 +38,11 @@ jobs:
           update-strategy: eager
           # Whether to install PDM plugins before update
           install-plugins: "false"
+
+      - name: "Export dependencies"
+        run: |
+          pdm export --without-hashes -o requirements.txt
+
+      # Ideally, we should export requirements.txt then amend the earlier PR
+      # update-deps-action could be modified to export PR number as as output
+      # Or we add the option to export the requirements.txt in that action
