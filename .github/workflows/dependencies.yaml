@@ -38,6 +38,7 @@ jobs:
           commit-message: "Chore: Update dependencies and pdm.lock [skip ci]"
           pr-title: "Update Python module dependencies"
           update-strategy: eager
+          export-reqs: true
           # Whether to install PDM plugins before update
           install-plugins: "false"
           export-reqs: true
