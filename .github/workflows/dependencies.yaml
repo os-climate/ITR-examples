@@ -31,18 +31,13 @@ jobs:
       - name: "Setup PDM for build commands"
         uses: pdm-project/setup-pdm@v3
 
-      - name: "Install dependencies"
+      - name: "Update and export dependencies"
         run: |
-          python -m pip install --upgrade pip
           pdm lock
-          pdm export -o requirements.txt
-          # Add banner reminder to NOT edit requirements.txt file
-          mv requirements.txt /tmp/requirements.txt
-          cp .requirements-banner.txt requirements.txt
-          cat /tmp/requirements.txt >> requirements.txt
+          pdm export --without-hashes -o requirements.txt
 
-      - name: Update dependencies
-        uses: ModeSevenIndustrialSolutions/update-deps-action@v1
+      - name: "Commit update to repository"
+        uses: pdm-project/update-deps-action@main
         with:
           sign-off-commit: "true"
           token: ${{ secrets.GH_TOKEN }}
