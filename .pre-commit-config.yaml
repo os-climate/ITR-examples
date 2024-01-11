@@ -2,9 +2,10 @@
 ci:
   autofix_commit_msg: "Chore: pre-commit autoupdate"
   skip:
-    # pre-commit.ci cannot install WGET, so tomlint must be disabled
+    # Pre-commit.ci cannot install WGET, so tomlint must be disabled
     - tomllint
-    # - pre-commit-update
+    # With type checking, mypy build exceeds pre-commit.ci tier max size 250MiB
+    - mypy
 
 exclude: |
   (?x)^(
@@ -158,5 +159,13 @@ repos:
     hooks:
       - id: mypy
         verbose: true
-        args: [--show-error-codes]
-        additional_dependencies: ["types-requests"]
+        args: ["--ignore-missing-imports", "--show-error-codes"]
+        additional_dependencies: [
+          "types-requests",
+          "pandas-stubs",
+          "pint",
+          "pint_pandas",
+          "diskcache",
+          "plotly",
+          "matplotlib-stubs",
+        ]
