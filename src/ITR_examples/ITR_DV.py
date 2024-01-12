@@ -12,6 +12,7 @@ import logging
 import os
 import pickle
 import sys
+import typing
 from pathlib import Path
 from uuid import uuid4
 
@@ -54,6 +55,7 @@ from ITR.interfaces import (
 )
 from ITR.portfolio_aggregation import PortfolioAggregationMethod
 from ITR.temperature_score import TemperatureScore
+from pandas.api.extensions import ExtensionArray
 from pint import Quantity
 from pint_pandas import PintType
 
@@ -297,7 +299,7 @@ def try_get_co2(prod_bm, ei_df_t, sectors, region, scope_list):
 
 
 # For OECM, calculate multi-sector footprints in a given activity.
-def get_co2_in_sectors_region_scope(prod_bm, ei_df_t, sectors, region, scope_list) -> pd.DataFrame:
+def get_co2_in_sectors_region_scope(prod_bm, ei_df_t, sectors, region, scope_list) -> pd.Series:
     """
     Aggregate benchmark emissions across SECTORS, returning a cumulative sum indexed by YEAR.
 
@@ -313,10 +315,12 @@ def get_co2_in_sectors_region_scope(prod_bm, ei_df_t, sectors, region, scope_lis
         if len(df.columns) == 1:
             return ser
         col_units = ser.dtype
+        assert isinstance(col_units, PintType)
         ser = ser.pint.m
         for i in range(1, len(df.columns)):
-            ser = ser + df.iloc[:, i].pint.m_as(str(col_units.units))
-        return ser.astype(str(col_units))
+            # Turn off typing while https://github.com/hgrecco/pint-pandas/issues/213 is open
+            ser = ser + df.iloc[:, i].pint.m_as(str(col_units.units))  # type: ignore
+        return typing.cast(ExtensionArray, ser).astype(str(col_units))
 
     if (not energy_sectors) + (not utility_sectors) + (not end_use_sectors) == 2:
         # All sectors are in a single activity, so aggregate by scope.  Caller sets scope!
