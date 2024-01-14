@@ -28,6 +28,23 @@ jobs:
       - name: "Install linting tools"
         run: pip install mypy
 
+      - name: "Install dependencies"
+        run: |
+          SOURCE=".pre-commit-config.yaml"
+
+          PKGS=$(yq '.repos[] | select \
+           (.repo == "https://github.com/pre-commit/mirrors-mypy")' \
+           .pre-commit-config.yaml | \
+           grep additional_dependencies | \
+           awk -F: '{print $2}' | \
+           sed "s/\[//g" | \
+           sed "s/\]//g" | \
+           sed "s/,//g" | \
+           sed 's/"//g')
+
+          echo "Install Python dependencies from: $SOURCE"
+          echo "With: pip install -y$PKGS"
+
       - name: "Linting with: mypy"
         uses: sasanquaneuf/mypy-github-action@releases/v1
         with:
