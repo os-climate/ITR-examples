@@ -2,9 +2,10 @@
 ci:
   autofix_commit_msg: "Chore: pre-commit autoupdate"
   skip:
-    # pre-commit.ci cannot install WGET, so tomlint must be disabled
+    # Pre-commit.ci cannot install WGET, so tomlint must be disabled
     - tomllint
-    # - pre-commit-update
+    # With type checking, mypy build exceeds pre-commit.ci tier max size 250MiB
+    - mypy
 
 exclude: |
   (?x)^(
