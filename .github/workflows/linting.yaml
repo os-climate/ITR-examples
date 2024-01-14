@@ -14,7 +14,7 @@ jobs:
   linting:
     # Don't run when pull request is merged
     if: github.event.pull_request.merged == false
-    name: "Standalone linting tools"
+    name: "Unsupported by pre-commit.ci"
     runs-on: "ubuntu-latest"
 
     steps:
@@ -30,20 +30,20 @@ jobs:
       - name: "Install linting tools"
         run: pip install pre-commit mypy
 
-      - name: "Run mypy from pre-commit"
-        run: pre-commit run --all-files mypy
-
-      - name: "Install dependencies"
+      # - name: "Install dependencies"
         # yamllint disable rule:line-length
-        run: |
-          SOURCE=".pre-commit-config.yaml"
-          echo "Install Python dependencies from: $SOURCE"
-          echo "With: pip install -y$PKGS"
-          # yamllint disable-line rule:line-length
-          PKGS=$(yq '.repos[] | select (.repo == "https://github.com/pre-commit/mirrors-mypy")' .pre-commit-config.yaml | \
-           grep additional_dependencies | \
-           awk -F: '{print $2}' | \
-           sed "s/\[//g" | \
-           sed "s/\]//g" | \
-           sed "s/,//g" | \
-           sed 's/"//g')
+      #   run: |
+      #     SOURCE=".pre-commit-config.yaml"
+      #     echo "Install Python dependencies from: $SOURCE"
+      #     echo "With: pip install -y$PKGS"
+      #     # yamllint disable-line rule:line-length
+      #     PKGS=$(yq '.repos[] | select (.repo == "https://github.com/pre-commit/mirrors-mypy")' .pre-commit-config.yaml | \
+      #      grep additional_dependencies | \
+      #      awk -F: '{print $2}' | \
+      #      sed "s/\[//g" | \
+      #      sed "s/\]//g" | \
+      #      sed "s/,//g" | \
+      #      sed 's/"//g')
+
+      - name: "Run mypy from pre-commit"
+        run: pre-commit run mypy -a
