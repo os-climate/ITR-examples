@@ -48,4 +48,4 @@ jobs:
         #      sed 's/"//g')
 
       - name: "Run mypy using pre-commit"
-        run: pre-comment run mypy -a
+        run: pre-commit run mypy -a
