@@ -168,4 +168,5 @@ repos:
           "diskcache",
           "plotly",
           "matplotlib-stubs",
+          "itr",
         ]
