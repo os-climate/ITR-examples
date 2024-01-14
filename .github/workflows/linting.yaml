@@ -33,7 +33,7 @@ jobs:
           pip install pre-commit mypy
 
       - name: "Run mypy using pre-commit"
-        run: pre-comment run mypy -a
+        run: pre-commit run mypy -a
 
         # yamllint disable rule:line-length
         # yamllint disable rule:comments-indentation
