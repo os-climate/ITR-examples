@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "test", "tox"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:e7231ab184bcf7cec7fbb1ba467046ef3dc7942db6234ed6468d4d8026f8f56d"
+content_hash = "sha256:b30a894463034cd902e2c7ccb6e4c18b564df366c75b176e3628e074323c7f48"
 
 [[package]]
 name = "alabaster"
@@ -136,6 +136,9 @@ name = "astroid"
 version = "3.0.2"
 requires_python = ">=3.8.0"
 summary = "An abstract syntax tree for Python with inference support."
+dependencies = [
+    "typing-extensions>=4.0.0; python_version < \"3.11\"",
+]
 files = [
     {file = "astroid-3.0.2-py3-none-any.whl", hash = "sha256:d6e62862355f60e716164082d6b4b041d38e2a8cf1c7cd953ded5108bac8ff5c"},
     {file = "astroid-3.0.2.tar.gz", hash = "sha256:4a61cf0a59097c7bb52689b0fd63717cd2a8a14dc9f1eee97b82d814881c8c91"},
@@ -1338,7 +1341,7 @@ files = [
 
 [[package]]
 name = "itr"
-version = "1.1.2"
+version = "1.1.3"
 requires_python = ">=3.9"
 summary = "Assess the temperature alignment of current targets, commitments, and investment and lending portfolios."
 dependencies = [
@@ -1374,8 +1377,8 @@ dependencies = [
     "xlrd==2.0.1",
 ]
 files = [
-    {file = "itr-1.1.2-py3-none-any.whl", hash = "sha256:5a11996d73fc99a1b8faf9b56dd9332c1baf96b91a4e8bffbace39f56c7cf1f1"},
-    {file = "itr-1.1.2.tar.gz", hash = "sha256:e0f565856e54f9ef8869b1056718b620ec8c145552a09b820f3619670cf88acb"},
+    {file = "itr-1.1.3-py3-none-any.whl", hash = "sha256:3342c2108a68cad039386eb3202c11147adb69b513e03a981cf5660d2c276d0e"},
+    {file = "itr-1.1.3.tar.gz", hash = "sha256:ffcd680691873f91ceb2d6a8889f2c4fe2f1b270c4dfec0b8cd4f23b17001f68"},
 ]
 
 [[package]]
