@@ -29,11 +29,11 @@ classifiers = [
 dependencies = [
     "ITR==v1.1.3",
     "pip>=23.3.1",
-    "dash==2.14.1",
+    "dash>=2.15.0",
     "dash-bootstrap-components==1.4.2",
     "diskcache==5.6.1",
     "flask==2.2.5",
-    "jupyterlab==4.0.4",
+    "jupyterlab>=4.0.11",
     "kaleido==0.2.1",
     "matplotlib==3.7.2",
     "multiprocess==0.70.14",
@@ -93,3 +93,6 @@ max-line-length = "120"
 extend-ignore = [
   "E501",
 ]
+
+[tool.mypy]
+ignore_missing_imports = true

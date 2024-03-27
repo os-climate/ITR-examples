@@ -146,9 +146,9 @@ def anonymize(portfolio, provider):
             provider.data["fundamental_data"]["company_name"] == company_name,
             "company_isic",
         ] = "C" + str(index + 1)
-        provider.data["target_data"].loc[
-            provider.data["target_data"]["company_name"] == company_name, "company_id"
-        ] = "C" + str(index + 1)
+        provider.data["target_data"].loc[provider.data["target_data"]["company_name"] == company_name, "company_id"] = (
+            "C" + str(index + 1)
+        )
         portfolio.loc[portfolio["company_name"] == company_name, "company_name"] = "Company" + str(index + 1)
         provider.data["fundamental_data"].loc[
             provider.data["fundamental_data"]["company_name"] == company_name,
