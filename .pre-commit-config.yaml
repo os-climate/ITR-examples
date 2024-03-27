@@ -2,10 +2,9 @@
 ci:
   autofix_commit_msg: "Chore: pre-commit autoupdate"
   skip:
-    # Pre-commit.ci cannot install WGET, so tomlint must be disabled
+    # pre-commit.ci cannot install WGET, so tomlint must be disabled
     - tomllint
-    # With type checking, mypy build exceeds pre-commit.ci tier max size 250MiB
-    - mypy
+    # - pre-commit-update
 
 exclude: |
   (?x)^(
@@ -64,9 +63,7 @@ repos:
     hooks:
       - id: prettier
         args:
-          [
-            '--ignore-unknown',
-          ]
+          ['--ignore-unknown', '--no-error-on-unmatched-pattern', '!chart/**']
 
   # Lint: Markdown
   - repo: https://github.com/igorshubovych/markdownlint-cli
@@ -147,8 +144,7 @@ repos:
     rev: "7.0.0"
     hooks:
       - id: flake8
-        entry: pflake8
-        additional_dependencies: [pyproject-flake8]
+        args: ["--extend-ignore=E203,E501", --max-line-length=160]
 
   # Check for misspells in documentation files:
   # - repo: https://github.com/codespell-project/codespell
@@ -161,14 +157,5 @@ repos:
     hooks:
       - id: mypy
         verbose: true
-        args: ["--ignore-missing-imports", "--show-error-codes"]
-        additional_dependencies: [
-          "types-requests",
-          "pandas-stubs",
-          "pint",
-          "pint_pandas",
-          "diskcache",
-          "plotly",
-          "matplotlib-stubs",
-          "itr",
-        ]
+        args: [--show-error-codes]
+        additional_dependencies: ["types-requests"]
