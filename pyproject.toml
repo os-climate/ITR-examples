@@ -82,6 +82,9 @@ source = ["src"]
 omit = ["test/*"]
 # relative_files = true
 
+[tool.coverage.report]
+fail_under = 70
+
 [tool.black]
 line-length = 120
 
