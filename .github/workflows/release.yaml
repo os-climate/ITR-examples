@@ -6,7 +6,7 @@ name: "🐍📦 Production build and release"
 
 # yamllint disable-line rule:truthy
 on:
-  # workflow_dispatch:
+  workflow_dispatch:
   push:
     # Only invoked on release tag pushes
     tags:
