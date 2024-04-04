@@ -12,10 +12,11 @@ on:
 
 jobs:
   linting:
-    # Don't run when pull request is merged
-    if: github.event.pull_request.merged == false
+
     name: "Unsupported by pre-commit.ci"
     runs-on: "ubuntu-latest"
+    # Don't run when pull request is merged
+    if: github.event.pull_request.merged == false
 
     steps:
 
