@@ -1,7 +1,9 @@
 import os
 import re
+from typing import Dict, List
 
 import osc_ingest_trino as osc
+import pytest
 import requests
 from ITR.data.osc_units import Quantity
 from ITR.interfaces import IEmissionRealization, IHistoricEmissionsScopes
@@ -21,7 +23,7 @@ except KeyError:
         pytestmark = pytest.mark.skip
         pytest.skip("skipping NZDPU because NZDPU_API_KEY not available", allow_module_level=True)
 
-data = {}  # for requests.post
+data: Dict[str, str] = {}  # for requests.post
 
 company_leis_nomatch = [
     "2NUNNB7D43COUIRE5295",
@@ -150,11 +152,6 @@ company_names = [
 ]
 # url = f"https://nzdpu.com/wis/external/search?name=f{comapny_name}&start=0&limit=10"
 
-headers = {
-    "accept": "application/json",
-    "access_key": os.environ["NZDPU_API_KEY"],
-}
-
 
 def get_nzdpu_historic_scopes(lei: str) -> IHistoricEmissionsScopes:
     response = requests.get(
@@ -164,7 +161,7 @@ def get_nzdpu_historic_scopes(lei: str) -> IHistoricEmissionsScopes:
     if response.status_code == 200:
         result = response.json()
         history = result["history"]
-        scope_lists = {"1": [], "2": [], "3": []}
+        scope_lists: Dict[str, List] = {"1": [], "2": [], "3": []}
         for h_year in history:
             reporting_year = h_year["reporting_year"]
             vals = h_year["submission"]["values"]
@@ -175,7 +172,7 @@ def get_nzdpu_historic_scopes(lei: str) -> IHistoricEmissionsScopes:
                 if k.endswith("_ghg") and vals[k] > 0 and (match := re.match(r".*_([123])_", k)):
                     # FIXME: the following collects both market-based and location-based S2 emissions
                     scope_lists[match.group(1)].append(
-                        IEmissionsRealization(year=reporting_year, value=Quantity(vals[k], units[k]))
+                        IEmissionRealization(year=reporting_year, value=Quantity(vals[k], units[k]))
                     )
         return IHistoricEmissionsScopes(
             S1=scope_lists["1"],
