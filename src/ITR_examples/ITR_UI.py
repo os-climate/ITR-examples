@@ -11,6 +11,7 @@ import logging
 import os
 import pickle
 import sys
+import typing
 from pathlib import Path
 from uuid import uuid4
 
@@ -44,6 +45,7 @@ from ITR.interfaces import (
 )
 from ITR.portfolio_aggregation import PortfolioAggregationMethod
 from ITR.temperature_score import TemperatureScore
+from pandas.api.extensions import ExtensionArray
 from pint import Quantity
 from pint_pandas import PintType
 
@@ -240,7 +242,7 @@ def try_get_co2(prod_bm, ei_df_t, sectors, region, scope_list):
 
 
 # For OECM, calculate multi-sector footprints in a given activity.
-def get_co2_in_sectors_region_scope(prod_bm, ei_df_t, sectors, region, scope_list) -> pd.DataFrame:
+def get_co2_in_sectors_region_scope(prod_bm, ei_df_t, sectors, region, scope_list) -> pd.Series:
     """
     Aggregate benchmark emissions across SECTORS, returning a cumulative sum indexed by YEAR.
 
@@ -256,10 +258,12 @@ def get_co2_in_sectors_region_scope(prod_bm, ei_df_t, sectors, region, scope_lis
         if len(df.columns) == 1:
             return ser
         col_units = ser.dtype
+        assert isinstance(col_units, PintType)
         ser = ser.pint.m
         for i in range(1, len(df.columns)):
-            ser = ser + df.iloc[:, i].pint.m_as(str(col_units.units))
-        return ser.astype(str(col_units))
+            # Turn off typing while https://github.com/hgrecco/pint-pandas/issues/213 is open
+            ser = ser + df.iloc[:, i].pint.m_as(str(col_units.units))  # type: ignore
+        return typing.cast(ExtensionArray, ser).astype(str(col_units))
 
     if (not energy_sectors) + (not utility_sectors) + (not end_use_sectors) == 2:
         # All sectors are in a single activity, so aggregate by scope.  Caller sets scope!
@@ -1055,9 +1059,11 @@ def recalculate_individual_itr(warehouse_pickle_json, eibm, proj_meth, winz, bm_
         if eibm.startswith("TPI_2_degrees"):
             extra_EI = os.path.join(
                 data_dir,
-                benchmark_EI_TPI_2deg_high_efficiency_file
-                if "_high_efficiency" in eibm
-                else benchmark_EI_TPI_2deg_shift_improve_file,
+                (
+                    benchmark_EI_TPI_2deg_high_efficiency_file
+                    if "_high_efficiency" in eibm
+                    else benchmark_EI_TPI_2deg_shift_improve_file
+                ),
             )
             with open(extra_EI) as json_file:
                 extra_json = json.load(json_file)
@@ -1628,9 +1634,9 @@ def calc_temperature_score(warehouse_pickle_json, target_year: int, budget_meth:
         scopes=None,  # None means "use the appropriate scopes for the benchmark
         # Options for the aggregation method are WATS, TETS, AOTS, MOTS, EOTS, ECOTS, and ROTS
         aggregation_method=PortfolioAggregationMethod.WATS,
-        budget_column=ColumnsConfig.CUMULATIVE_SCALED_BUDGET
-        if budget_meth == "contraction"
-        else ColumnsConfig.CUMULATIVE_BUDGET,
+        budget_column=(
+            ColumnsConfig.CUMULATIVE_SCALED_BUDGET if budget_meth == "contraction" else ColumnsConfig.CUMULATIVE_BUDGET
+        ),
     )
 
     if "target_probability" in changed_ids:
@@ -1835,11 +1841,9 @@ def update_graph(
     # Covered companies analysis; if we pre-filter portfolio-df, then we'll never have "uncovered" companies here
     coverage = filt_df.reset_index("company_id")[["company_id", "scope", "ghg_s1s2", "ghg_s3", "cumulative_target"]]
     coverage["ghg"] = coverage.apply(
-        lambda x: x.ghg_s1s2 + x.ghg_s3
-        if x.scope == EScope.S1S2S3
-        else x.ghg_s3
-        if x.scope == EScope.S3
-        else x.ghg_s1s2,
+        lambda x: (
+            x.ghg_s1s2 + x.ghg_s3 if x.scope == EScope.S1S2S3 else x.ghg_s3 if x.scope == EScope.S3 else x.ghg_s1s2
+        ),
         axis=1,
     ).astype("pint[t CO2e]")
     coverage["coverage_category"] = np.where(
