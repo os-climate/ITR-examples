@@ -1,19 +1,28 @@
 import os
 import re
-import requests
-from typing import Dict, List, Tuple
- 
+
 import osc_ingest_trino as osc
+import requests
+from ITR.data.osc_units import Quantity
+from ITR.interfaces import IEmissionRealization, IHistoricEmissionsScopes
+
 osc.load_credentials_dotenv()
 
-import ITR
-from ITR.interfaces import EScope, IEmissionsRealization, IHistoricEmissionsScopes
-from ITR.data.osc_units import Quantity
-
 url = "https://nzdpu.com/wis/coverage/companies/Q9MAIUP40P25UFBFG033/history"
-headers = {"accept": "application/json", "access_key": os.environ["NZDPU_API_KEY"],}
+try:
+    headers = {
+        "accept": "application/json",
+        "access_key": os.environ["NZDPU_API_KEY"],
+    }
+except KeyError:
+    if pytest.__version__ < "3.0.0":
+        pytest.skip()
+    else:
+        pytestmark = pytest.mark.skip
+        pytest.skip("skipping NZDPU because NZDPU_API_KEY not available", allow_module_level=True)
+
 data = {}  # for requests.post
- 
+
 company_leis_nomatch = [
     "2NUNNB7D43COUIRE5295",
     "3SOUA6IRML7435B56G12",
@@ -141,7 +150,11 @@ company_names = [
 ]
 # url = f"https://nzdpu.com/wis/external/search?name=f{comapny_name}&start=0&limit=10"
 
-headers = {"accept": "application/json", "access_key": os.environ["NZDPU_API_KEY"],}
+headers = {
+    "accept": "application/json",
+    "access_key": os.environ["NZDPU_API_KEY"],
+}
+
 
 def get_nzdpu_historic_scopes(lei: str) -> IHistoricEmissionsScopes:
     response = requests.get(
@@ -151,9 +164,9 @@ def get_nzdpu_historic_scopes(lei: str) -> IHistoricEmissionsScopes:
     if response.status_code == 200:
         result = response.json()
         history = result["history"]
-        scope_lists = { '1': [], '2': [], '3': [] }
+        scope_lists = {"1": [], "2": [], "3": []}
         for h_year in history:
-            year = h_year["reporting_year"]
+            reporting_year = h_year["reporting_year"]
             vals = h_year["submission"]["values"]
             units = h_year["submission"]["units"]
             for k, v in units.items():
@@ -165,9 +178,9 @@ def get_nzdpu_historic_scopes(lei: str) -> IHistoricEmissionsScopes:
                         IEmissionsRealization(year=reporting_year, value=Quantity(vals[k], units[k]))
                     )
         return IHistoricEmissionsScopes(
-            S1=scope_lists['1'],
-            S2=scope_lists['2'],
-            S3=scope_lists['3'],
+            S1=scope_lists["1"],
+            S2=scope_lists["2"],
+            S3=scope_lists["3"],
         )
     else:
         print("Request failed with status code:", response.status_code)
