@@ -1,6 +1,6 @@
 [project]
 name = "ITR-examples"
-version = "v1.1.2"
+version = "v1.1.5"
 description = "Example code and user interface for the ITR project."
 authors = [
   { name = "Michael Tiemann", email = "72577720+MichaelTiemannOSC@users.noreply.github.com" },
@@ -28,7 +28,7 @@ classifiers = [
   "Topic :: Software Development",
 ]
 dependencies = [
-    "ITR>=1.1.4",
+    "ITR==1.1.4",
     "pip>=23.3.1",
     "dash==2.16.1",
     "dash-bootstrap-components==1.6.0",
@@ -70,10 +70,21 @@ test = ["pdm[pytest]", "pytest-cov"]
 tox = ["tox", "tox-pdm>=0.5"]
 docs = ["sphinx>=7.2.6", "sphinx-copybutton>=0.5.2"]
 dev = ["tox>=4.11.3", "tox-pdm>=0.7.0"]
-lint = ["pre-commit", "pyproject-flake8"]
+lint = ["pre-commit"]
 
 [tool.pytest.ini_options]
-testpaths = ["test/"]
+testpaths = [
+    "test/",
+]
+addopts = "--cov --cov-report html --cov-report term-missing --cov-fail-under 95"
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["test/*"]
+# relative_files = true
+
+[tool.coverage.report]
+fail_under = 0
 
 [tool.black]
 line-length = 120
@@ -86,3 +97,6 @@ max-line-length = "120"
 extend-ignore = [
   "E501",
 ]
+
+[tool.mypy]
+ignore_missing_imports = true
