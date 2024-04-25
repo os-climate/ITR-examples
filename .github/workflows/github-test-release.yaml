@@ -126,7 +126,7 @@ jobs:
           tag_name: ${{ steps.setenv.outputs.vernum }}
           name: "Test/Development Build \
             ${{ steps.setenv.outputs.vernum }}"
-          body_path: ${{ github.workspace }}/CHANGELOG.rst
+          # body_path: ${{ github.workspace }}/CHANGELOG.rst
           files: |
             dist/*.tar.gz
             dist/*.whl
