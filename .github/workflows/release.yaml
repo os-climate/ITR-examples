@@ -55,7 +55,6 @@ jobs:
       ### SIGNING ###
 
       - name: "Sign packages with Sigstore"
-        # yamllint disable-line rule:line-length
         uses: sigstore/gh-action-sigstore-python@v2
         with:
           inputs: >-
