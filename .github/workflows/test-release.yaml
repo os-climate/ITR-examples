@@ -63,7 +63,7 @@ jobs:
 
       - name: "Sign packages with Sigstore"
         # yamllint disable-line rule:line-length
-        uses: sigstore/gh-action-sigstore-python@8578b545c2f8949211a185e5cf0ece7c17030a7a  # v3.0.0
+        uses: sigstore/gh-action-sigstore-python@v2
         with:
           inputs: >-
             ./dist/*.tar.gz
