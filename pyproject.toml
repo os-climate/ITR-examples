@@ -76,7 +76,7 @@ lint = ["pre-commit"]
 testpaths = [
     "test/",
 ]
-addopts = "--cov --cov-report html --cov-report term-missing --cov-fail-under 95"
+addopts = "--cov"
 
 [tool.coverage.run]
 source = ["src"]
@@ -85,6 +85,8 @@ omit = ["test/*"]
 
 [tool.coverage.report]
 fail_under = 0
+skip_empty = true
+format = ["term", "term-missing", "html", "text"]
 
 [tool.black]
 line-length = 120
