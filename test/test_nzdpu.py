@@ -21,7 +21,10 @@ except KeyError:
         pytest.skip()
     else:
         pytestmark = pytest.mark.skip
-        pytest.skip("skipping NZDPU because NZDPU_API_KEY not available", allow_module_level=True)
+        pytest.skip(
+            "skipping NZDPU because NZDPU_API_KEY not available",
+            allow_module_level=True,
+        )
 
 data: Dict[str, str] = {}  # for requests.post
 
@@ -169,10 +172,16 @@ def get_nzdpu_historic_scopes(lei: str) -> IHistoricEmissionsScopes:
             for k, v in units.items():
                 if v is None or type(v) is list:
                     continue
-                if k.endswith("_ghg") and vals[k] > 0 and (match := re.match(r".*_([123])_", k)):
+                if (
+                    k.endswith("_ghg")
+                    and vals[k] > 0
+                    and (match := re.match(r".*_([123])_", k))
+                ):
                     # FIXME: the following collects both market-based and location-based S2 emissions
                     scope_lists[match.group(1)].append(
-                        IEmissionRealization(year=reporting_year, value=Quantity(vals[k], units[k]))
+                        IEmissionRealization(
+                            year=reporting_year, value=Quantity(vals[k], units[k])
+                        )
                     )
         return IHistoricEmissionsScopes(
             S1=scope_lists["1"],
