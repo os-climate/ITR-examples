@@ -19,9 +19,6 @@ on:
 env:
   DEFAULT-PYTHON: "3.11"
 
-env:
-  DEFAULT-PYTHON: "3.11"
-
 jobs:
   classify-content:
     name: "Inspect Repository"
