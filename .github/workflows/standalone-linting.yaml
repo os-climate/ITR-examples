@@ -23,5 +23,3 @@ jobs:
       contents: read
     # yamllint disable-line rule:line-length
     uses: os-climate/osc-github-devops/.github/workflows/reuse-linting.yaml@main # 2025-02-12
-    with:
-      force_remote: "true"
