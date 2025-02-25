@@ -1,0 +1,182 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2024 The Linux Foundation
+
+# Performs a build, runs tests, performs a release
+name: "🤖 Release [Tag Push]"
+
+# yamllint disable-line rule:truthy
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+
+permissions: {}
+
+jobs:
+  repository:
+    name: "Repository"
+    # yamllint disable-line rule:line-length
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-inspect-repository.yaml@e40c93a51cc32cbddd4767a75e2209af971df9e0 # 2025-02-25
+    permissions:
+      contents: read
+
+  python-build:
+      name: "Python build"
+      needs: repository
+      if: needs.repository.outputs.python_project  == 'true'
+      runs-on: ubuntu-24.04
+      outputs:
+        matrix_json: ${{ steps.python-build.outputs.matrix_json }}
+        artefact_path: ${{ steps.python-build.outputs.artefact_path }}
+      permissions:
+        contents: write
+        # Required by SigStore signing action
+        id-token: write
+        # Required for attestations
+        attestations: write
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      steps:
+        - name: "Build Python project"
+          id: python-build
+          # yamllint disable-line rule:line-length
+          uses: os-climate/osc-github-devops/.github/actions/python-build-action@e40c93a51cc32cbddd4767a75e2209af971df9e0 # 2025-02-25
+          with:
+            tag: ${{ needs.repository.outputs.build_tag }}
+            attestations: "true"
+            sigstore_sign: "true"
+
+  python-test:
+    name: "Test"
+    # yamllint disable-line rule:line-length
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-python-tests.yaml@e40c93a51cc32cbddd4767a75e2209af971df9e0 # 2025-02-25
+    needs:
+      - repository
+      - python-build
+    # Matrix job
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.python-build.outputs.matrix_json) }}
+    with:
+      python_version: ${{ matrix.python-version }}
+    permissions:
+      contents: read
+
+  python-audit:
+    name: "Audit"
+    # yamllint disable-line rule:line-length
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-python-audit.yaml@e40c93a51cc32cbddd4767a75e2209af971df9e0 # 2025-02-25
+    needs:
+      - repository
+      - python-build
+    # Matrix job
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.python-build.outputs.matrix_json) }}
+    with:
+      python_version: ${{ matrix.python-version }}
+    permissions:
+      contents: read
+
+  notebooks:
+    name: "Notebooks"
+    if: needs.repository.outputs.jupyter_notebooks  == 'true'
+    # yamllint disable-line rule:line-length
+    uses: os-climate/osc-github-devops/.github/workflows/reuse-notebook-tests.yaml@e40c93a51cc32cbddd4767a75e2209af971df9e0 # 2025-02-25
+    needs:
+      - repository
+      - python-build
+    # Matrix job
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.python-build.outputs.matrix_json) }}
+    with:
+      python_version: ${{ matrix.python-version }}
+    permissions:
+      contents: read
+
+  pypi-test:
+    name: "Test release: PyPI"
+    needs:
+      - repository
+      - python-build
+      - python-audit
+      - python-test
+    runs-on: "ubuntu-24.04"
+    permissions:
+      contents: read
+      # Needed for trusted publishing; must also be passed from parent workflows
+      id-token: write
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # Note: environment must be specified at BOTH job level, and input to publish action
+    environment: development
+    steps:
+      - name: "Test Package Publishing"
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/pypi-publish-action@e40c93a51cc32cbddd4767a75e2209af971df9e0 # 2025-02-25
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          environment: development
+          tag: ${{ needs.repository.outputs.build_tag }}
+          # yamllint disable-line rule:line-length
+          one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/tm2ffuusrynfivtcsnamginhm4/password"
+          op_service_account_token: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
+          pypi_credential: ${{ secrets.PYPI_PRODUCTION }}
+          attestations: "true"
+
+  pypi-release:
+          name: "PyPI release"
+          # yamllint disable-line rule:line-length
+          if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
+          needs:
+            - repository
+            - pypi-test
+          runs-on: "ubuntu-24.04"
+          permissions:
+            contents: read
+            # Needed for trusted publishing; must also be passed from parent workflows
+            id-token: write
+          env:
+            GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Note: environment must be specified at BOTH job level, and input to publish action
+          environment: production
+          steps:
+            # Need repository content to extract project name
+            - name: "Release to PyPI"
+              # yamllint disable-line rule:line-length
+              uses: os-climate/osc-github-devops/.github/actions/pypi-publish-action@e40c93a51cc32cbddd4767a75e2209af971df9e0 # 2025-02-25
+              env:
+                GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                environment: production
+                tag: ${{ needs.repository.outputs.build_tag }}
+                # yamllint disable-line rule:line-length
+                one_password_item: "op://hdiyadcjno2knqgvcy4wj5ulya/vds5rebqxeqfrjqwpszxxicmzq/password"
+                op_service_account_token: ${{ secrets.ONE_PASSWORD_PRODUCTION }}
+                pypi_credential: ${{ secrets.PYPI_PRODUCTION }}
+                attestations: "true"
+
+  github-release:
+    name: "GitHub release"
+    # yamllint disable-line rule:line-length
+    if: startsWith(github.ref, 'refs/tags/') || contains(github.event.head_commit.message, '[release]')
+    needs:
+      - repository
+      - pypi-test
+    runs-on: "ubuntu-24.04"
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - name: "GitHub Release"
+        # yamllint disable-line rule:line-length
+        uses: os-climate/osc-github-devops/.github/actions/github-release-action@e40c93a51cc32cbddd4767a75e2209af971df9e0 # 2025-02-25
+        with:
+          project_name: ${{ env.python_project_name }}
+          artefact_path: "dist"
+          tag: ${{ needs.repository.outputs.build_tag }}
+          token: ${{ secrets.GITHUB_TOKEN }}
