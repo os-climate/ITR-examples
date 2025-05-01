@@ -37,21 +37,21 @@ jobs:
 
       - name: "Set up Python"
       # yamllint disable-line rule:line-length
-        uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: "3.11"
 
       - name: "Check documentation dependencies"
         id: docs-requirements
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/path-check-action@50987892d52819798d74f5b381d3abfb8d54cbf0 # 2024-12-31
+        uses: os-climate/osc-github-devops/.github/actions/path-check-action@7128a1e4ddc0b1e62cf4171bebc81fbcb4553a6a # 2024-12-31
         with:
           path: "docs/requirements.txt"
 
       - name: "Check for TOX configuration"
         id: tox-ini
         # yamllint disable-line rule:line-length
-        uses: os-climate/osc-github-devops/.github/actions/path-check-action@50987892d52819798d74f5b381d3abfb8d54cbf0 # 2024-12-31
+        uses: os-climate/osc-github-devops/.github/actions/path-check-action@7128a1e4ddc0b1e62cf4171bebc81fbcb4553a6a # 2024-12-31
         with:
           path: "tox.ini"
 
