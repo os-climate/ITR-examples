@@ -1,8 +1,8 @@
 ---
 # SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: 2024 The Linux Foundation
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
 
-name: '⛔️ Standalone Linting'
+name: 'Standalone Linting'
 
 # yamllint disable-line rule:truthy
 on:
@@ -17,12 +17,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  standalone-linting:
-    name: 'Standalone Linting'
+  pre-commit:
+    name: 'Pre-Commit'
     permissions:
       contents: read
-    # yamllint disable-line rule:line-length
-    uses: modeseven-lfit/releng-reusable-workflows/.github/workflows/reuse-standalone-linting.yaml@update-standalone-linting # Testing
-    with:
+    runs-on: 'ubuntu-latest'
+    steps:
+      # Harden the runner used by this workflow
       # yamllint disable-line rule:line-length
-      config_url: 'https://raw.githubusercontent.com/os-climate/ITR-examples/refs/heads/main/resources/standalone-linting/.pre-commit-config.yaml'
+      - uses: step-security/harden-runner@0634a2670c59f64b4a01f0f96f84700a4088b9f0 # v2.12.0
+        with:
+          egress-policy: audit
+
+      - name: 'Standlone linting check'
+        # yamllint disable-line rule:line-length
+        uses: lfreleng-actions/standalone-linting-action@cd0e39a5420ae667ad3efe5c14aa39d7d2a159db # v0.1.0
+        with:
+          # yamllint disable-line rule:line-length
+          config_url: 'https://raw.githubusercontent.com/os-climate/ITR-examples/refs/heads/main/resources/standalone-linting/.pre-commit-config.yaml'
