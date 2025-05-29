@@ -22,7 +22,7 @@ jobs:
     permissions:
       contents: read
     # yamllint disable-line rule:line-length
-    uses: modeseven-lfit/releng-reusable-workflows/.github/workflows/reuse-standalone-linting.yaml@update-standalone-linting # Testing
+    uses: modeseven-lfit/releng-reusable-workflows/.github/workflows/reuse-standalone-linting@update-standalone-linting # Testing
     with:
       # yamllint disable-line rule:line-length
       config_url: 'https://raw.githubusercontent.com/os-climate/ITR-examples/refs/heads/main/resources/standalone-linting/.pre-commit-config.yaml'
