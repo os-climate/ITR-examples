@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-FileCopyrightText: 2024 The Linux Foundation
 
-name: "⛔️ Standalone Linting"
+name: '⛔️ Standalone Linting'
 
 # yamllint disable-line rule:truthy
 on:
@@ -18,8 +18,11 @@ concurrency:
 
 jobs:
   standalone-linting:
-    name: "Standalone Linting"
+    name: 'Standalone Linting'
     permissions:
       contents: read
     # yamllint disable-line rule:line-length
-    uses: lfit/releng-reusable-workflows/.github/workflows/reuse-standalone-linting.yaml@ef858312893b8125bb629243c9b66afe606aad77 # 2025-02-13
+    uses: modeseven-lfit/releng-reusable-workflows/.github/workflows/reuse-standalone-linting.yaml@update-standalone-linting # Testing
+    with:
+      # yamllint disable-line rule:line-length
+      config_url: 'https://raw.githubusercontent.com/os-climate/ITR-examples/refs/heads/main/resources/standalone-linting/.pre-commit-config.yaml'
