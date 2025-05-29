@@ -1,0 +1,25 @@
+---
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: 2025 The Linux Foundation
+
+# Pre-commit configuration for standalone linting checks
+
+# mypy can be too demanding on resources to run under pre-commit.ci
+
+repos:
+  - repo: local
+    hooks:
+      - id: mypy-cache
+        name: "create mypy cache"
+        language: system
+        pass_filenames: false
+        entry: bash -c 'if [ ! -d .mypy_cache ]; then mkdir .mypy_cache; fi'
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    # Manually managed version
+    rev: "v1.14.1"
+    hooks:
+      - id: mypy
+        verbose: true
+        args: ["--show-error-codes", "--install-types", "--non-interactive"]
+        additional_dependencies: ["pytest", "types-requests"]
