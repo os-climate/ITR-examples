@@ -1871,9 +1871,11 @@ class TestTargets(unittest.TestCase):
         dequantified_df = target_df.pint.dequantify().droplevel(1, axis=1)
         # May have uncertainties...or some columns may be Float64
         dequantified_df = dequantified_df.apply(
-            lambda col: col
-            if col.dtype == "float64"
-            else ITR.nominal_values(col).astype(np.float64)
+            lambda col: (
+                col
+                if col.dtype == "float64"
+                else ITR.nominal_values(col).astype(np.float64)
+            )
         )
         fig_target = px.line(
             dequantified_df, y=dequantified_df.filter(regex="Target:").columns
