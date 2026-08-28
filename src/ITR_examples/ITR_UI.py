@@ -1996,8 +1996,9 @@ def update_graph(
         # Promote to UFloats if needed
         if isinstance(filt_df.cumulative_target.iloc[0].m, ITR.UFloat):
             filt_df = filt_df.assign(
-                cumulative_trajectory=lambda x: x.cumulative_trajectory
-                + ITR.ufloat(0, 0)
+                cumulative_trajectory=lambda x: (
+                    x.cumulative_trajectory + ITR.ufloat(0, 0)
+                )
             )
         else:
             filt_df = filt_df.assign(
@@ -2185,9 +2186,11 @@ def update_graph(
                 list,
                 zip(
                     *map(
-                        lambda x: (x.m.n, x.m.s)
-                        if isinstance(x.m, ITR.UFloat)
-                        else (x.m, 0.0),
+                        lambda x: (
+                            (x.m.n, x.m.s)
+                            if isinstance(x.m, ITR.UFloat)
+                            else (x.m, 0.0)
+                        ),
                         scores,
                     )
                 ),
